@@ -1,0 +1,59 @@
+body {
+  margin: 0;
+}
+
+.main {
+  background-color: #2e302e;
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  grid-auto-flow: column;
+  overflow-y: hidden;
+}
+
+canvas#gamecanvas {
+  background-color: black;
+  border-style: solid;
+  border-color: white;
+  height: 100vh;
+  width: 500px;
+}
+
+.cancontainer {
+  display: flex;
+  justify-content: center;
+}
+
+.controlsContainer {
+  display: grid;
+  grid-auto-flow: row;
+  grid-auto-rows: 2;
+}
+
+.buttonContainer {
+  display: flex;
+  align-items: end;
+}
+
+button.controlButton {
+  background-color: #2e302e;
+  display: block;
+  margin-bottom: 10px;
+  padding-left: 10rem;
+  padding-right: 10rem;
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+  font-weight: bold;
+  font-size: 5rem;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  outline: none;
+  border-width: 1px;
+  border-color: gray;
+}
+
+button.controlButton:active {
+  border-style: solid;
+  border-color: white;
+}
