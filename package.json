@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
 
-    "build":"tsc"
+    "build":"tsc",
+    "build-watch":"tsc --watch",
+    "start":"serve"
   },
   "keywords": [],
   "author": "",

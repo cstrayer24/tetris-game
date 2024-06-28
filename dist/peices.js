@@ -1,5 +1,5 @@
 import { BLOCKH, BLOCKW } from "./constants.js";
-import { drawBlock } from "./drawUtils.js";
+import { drawBlock, clearAbove, clearAhead, clearBehind } from "./drawUtils.js";
 class Block {
     constructor(x, y, w, h, color) {
         this.color = color;
@@ -15,62 +15,87 @@ class Tetriminoe {
         this.py = y;
         this.color = color;
     }
-    draw(ctx) { }
+    draw(ctx) {
+        this.blks.forEach((v) => drawBlock(v, ctx));
+    }
+    clearAbove(ctx) {
+        this.blks.forEach((v) => clearAbove(ctx, v));
+    }
+    clearRight(ctx) {
+        this.blks.forEach((v) => clearBehind(ctx, v));
+    }
+    clearLeft(ctx) {
+        this.blks.forEach((v) => clearAhead(ctx, v));
+    }
 }
 class Straight extends Tetriminoe {
-    constructor(x, y, color) {
-        super(x, y, color);
-        this.blk = new Block(this.px, this.py, BLOCKW, BLOCKH * 4, this.color);
-    }
-    draw(ctx) {
-        drawBlock(this.blk, ctx);
+    constructor(x, y) {
+        super(x, y, "blue");
+        this.blks = [
+            new Block(this.px, this.py, BLOCKW, BLOCKH, this.color),
+            new Block(this.px, this.py + BLOCKH, BLOCKW, BLOCKH, this.color),
+            new Block(this.px, this.py + BLOCKH * 2, BLOCKW, BLOCKH, this.color),
+            new Block(this.px, this.py + BLOCKH * 3, BLOCKW, BLOCKH, this.color),
+        ];
     }
     get x() {
-        return this.blk.x;
+        return this.px;
     }
     set x(nx) {
-        this.blk.x = nx;
+        this.px = nx;
+        this.blks.forEach((v) => {
+            v.x = this.px;
+        });
     }
     get y() {
-        return this.blk.y;
+        return this.py;
     }
     set y(ny) {
-        this.blk.y = ny;
+        this.py = ny;
+        this.blks.forEach((v, i) => {
+            v.y = this.py + BLOCKH * i;
+        });
     }
 }
 class Square extends Tetriminoe {
-    constructor(x, y, color) {
-        super(x, y, color);
-        this.blk = new Block(x, y, BLOCKW * 2, BLOCKH * 2, color);
-    }
-    draw(ctx) {
-        drawBlock(this.blk, ctx);
+    constructor(x, y) {
+        super(x, y, "yellow");
+        this.blks = [
+            new Block(this.px, this.py, BLOCKW, BLOCKH, this.color),
+            new Block(this.px + BLOCKW, this.py, BLOCKW, BLOCKH, this.color),
+            new Block(this.px, this.py + BLOCKH, BLOCKW, BLOCKH, this.color),
+            new Block(this.px + BLOCKW, this.py + BLOCKH, BLOCKW, BLOCKH, this.color),
+        ];
     }
     get x() {
-        return this.blk.x;
+        return this.px;
     }
     set x(nx) {
-        this.blk.x = nx;
+        this.px = nx;
+        this.blks[0].x = this.px;
+        this.blks[1].x = this.px + BLOCKW;
+        this.blks[2].x = this.px;
+        this.blks[3].x = this.px + BLOCKW;
     }
     get y() {
-        return this.blk.y;
+        return this.py;
     }
     set y(ny) {
-        this.blk.y = ny;
+        this.py = ny;
+        this.blks.forEach((v, i) => {
+            i <= 1 ? (v.y = this.py) : (v.y = this.py + BLOCKH);
+        });
     }
 }
 class Tri extends Tetriminoe {
-    constructor(x, y, color) {
-        super(x, y, color);
+    constructor(x, y) {
+        super(x, y, "purple");
         this.blks = [
-            new Block(x, y + BLOCKH, BLOCKW, BLOCKH, color),
-            new Block(x + BLOCKW, y + BLOCKH, BLOCKW, BLOCKH, color),
-            new Block(x - BLOCKW, y + BLOCKH, BLOCKW, BLOCKH, color),
-            new Block(x, y, BLOCKW, BLOCKH, color),
+            new Block(x, y + BLOCKH, BLOCKW, BLOCKH, this.color),
+            new Block(x + BLOCKW, y + BLOCKH, BLOCKW, BLOCKH, this.color),
+            new Block(x - BLOCKW, y + BLOCKH, BLOCKW, BLOCKH, this.color),
+            new Block(x, y, BLOCKW, BLOCKH, this.color),
         ];
-    }
-    draw(ctx) {
-        this.blks.forEach((v) => drawBlock(v, ctx));
     }
     get x() {
         return this.px;
@@ -94,8 +119,8 @@ class Tri extends Tetriminoe {
     }
 }
 class LeftwardZigZag extends Tetriminoe {
-    constructor(x, y, color) {
-        super(x, y, color);
+    constructor(x, y) {
+        super(x, y, "green");
         this.blks = [
             new Block(this.px - BLOCKW, this.py + BLOCKH, BLOCKW, BLOCKH, this.color),
             new Block(this.px, this.py + BLOCKH, BLOCKW, BLOCKH, this.color),
@@ -103,13 +128,34 @@ class LeftwardZigZag extends Tetriminoe {
             new Block(this.px + BLOCKW, this.py, BLOCKW, BLOCKH, this.color),
         ];
     }
-    draw(ctx) {
-        this.blks.forEach((v) => drawBlock(v, ctx));
+    clearAbove(ctx) {
+        clearAbove(ctx, this.blks[0]);
+        clearAbove(ctx, this.blks[1]);
+        clearAbove(ctx, this.blks[3]);
+    }
+    get x() {
+        return this.px;
+    }
+    set x(nx) {
+        this.px = nx;
+        this.blks[0].x = this.px - BLOCKW;
+        this.blks[1].x = this.px;
+        this.blks[2].x = this.px;
+        this.blks[3].x = this.px + BLOCKW;
+    }
+    get y() {
+        return this.py;
+    }
+    set y(ny) {
+        this.py = ny;
+        this.blks.forEach((v, i) => {
+            i <= 1 ? (v.y = this.py + BLOCKH) : (v.y = this.py);
+        });
     }
 }
 class RightwardZigZag extends Tetriminoe {
-    constructor(x, y, color) {
-        super(x, y, color);
+    constructor(x, y) {
+        super(x, y, "red");
         this.blks = [
             new Block(this.px + BLOCKW, this.py + BLOCKH, BLOCKW, BLOCKH, this.color),
             new Block(this.px, this.py + BLOCKH, BLOCKW, BLOCKH, this.color),
@@ -117,36 +163,84 @@ class RightwardZigZag extends Tetriminoe {
             new Block(this.px - BLOCKW, this.py, BLOCKW, BLOCKH, this.color),
         ];
     }
-    draw(ctx) {
-        this.blks.forEach((v) => drawBlock(v, ctx));
+    get x() {
+        return this.px;
+    }
+    set x(nx) {
+        this.px = nx;
+        this.blks[0].x = this.px + BLOCKW;
+        this.blks[1].x = this.px;
+        this.blks[2].x = this.px;
+        this.blks[3].x = this.px - BLOCKW;
+    }
+    get y() {
+        return this.py;
+    }
+    set y(ny) {
+        this.py = ny;
+        this.blks.forEach((v, i) => {
+            i <= 1 ? (v.y = this.py + BLOCKH) : (v.y = this.py);
+        });
     }
 }
 class LeftwardL extends Tetriminoe {
-    constructor(x, y, color) {
-        super(x, y, color);
+    constructor(x, y) {
+        super(x, y, "pink");
         this.blks = [
-            new Block(this.px, this.py, BLOCKW, BLOCKH, color),
-            new Block(this.px, this.py + BLOCKH, BLOCKW, BLOCKH, color),
-            new Block(this.px, this.py + BLOCKH * 2, BLOCKW, BLOCKH, color),
+            new Block(this.px, this.py, BLOCKW, BLOCKH, this.color),
+            new Block(this.px, this.py + BLOCKH, BLOCKW, BLOCKH, this.color),
+            new Block(this.px, this.py + BLOCKH * 2, BLOCKW, BLOCKH, this.color),
             new Block(this.px - BLOCKW, this.py + BLOCKH * 2, BLOCKW, BLOCKH, this.color),
         ];
     }
-    draw(ctx) {
-        this.blks.forEach((v) => drawBlock(v, ctx));
+    get x() {
+        return this.px;
+    }
+    set x(nx) {
+        this.px = nx;
+        this.blks.forEach((v, i) => {
+            i !== this.blks.length - 1 ? (v.x = this.px) : (v.x = this.px - BLOCKW);
+        });
+    }
+    get y() {
+        return this.py;
+    }
+    set y(ny) {
+        this.py = ny;
+        this.blks[0].y = this.py;
+        this.blks[1].y = this.py + BLOCKH;
+        this.blks[2].y = this.py + BLOCKH * 2;
+        this.blks[3].y = this.py + BLOCKH * 2;
     }
 }
 class RightwardL extends Tetriminoe {
-    constructor(x, y, color) {
-        super(x, y, color);
+    constructor(x, y) {
+        super(x, y, "orange");
         this.blks = [
-            new Block(this.px, this.py, BLOCKW, BLOCKH, color),
-            new Block(this.px, this.py + BLOCKH, BLOCKW, BLOCKH, color),
-            new Block(this.px, this.py + BLOCKH * 2, BLOCKW, BLOCKH, color),
+            new Block(this.px, this.py, BLOCKW, BLOCKH, this.color),
+            new Block(this.px, this.py + BLOCKH, BLOCKW, BLOCKH, this.color),
+            new Block(this.px, this.py + BLOCKH * 2, BLOCKW, BLOCKH, this.color),
             new Block(this.px + BLOCKW, this.py + BLOCKH * 2, BLOCKW, BLOCKH, this.color),
         ];
     }
-    draw(ctx) {
-        this.blks.forEach((v) => drawBlock(v, ctx));
+    get x() {
+        return this.px;
+    }
+    set x(nx) {
+        this.px = nx;
+        this.blks.forEach((v, i) => {
+            i === this.blks.length - 1 ? (v.x = this.px + BLOCKW) : (v.x = this.px);
+        });
+    }
+    get y() {
+        return this.py;
+    }
+    set y(ny) {
+        this.py = ny;
+        this.blks[0].y = this.py;
+        this.blks[1].y = this.py + BLOCKH;
+        this.blks[2].y = this.py + BLOCKH * 2;
+        this.blks[3].y = this.py + BLOCKH * 2;
     }
 }
 export { Block, Straight, Square, Tri, LeftwardZigZag, RightwardZigZag, LeftwardL, RightwardL, };
