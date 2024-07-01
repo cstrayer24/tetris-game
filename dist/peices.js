@@ -128,11 +128,6 @@ class LeftwardZigZag extends Tetriminoe {
             new Block(this.px + BLOCKW, this.py, BLOCKW, BLOCKH, this.color),
         ];
     }
-    clearAbove(ctx) {
-        clearAbove(ctx, this.blks[0]);
-        clearAbove(ctx, this.blks[1]);
-        clearAbove(ctx, this.blks[3]);
-    }
     get x() {
         return this.px;
     }

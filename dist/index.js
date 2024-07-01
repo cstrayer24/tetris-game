@@ -10,12 +10,12 @@ const peices = [
     Straight,
     Tri,
     RightwardL,
-    LeftwardL, //needs logic
+    LeftwardL,
 ];
 let playingGame = false;
-let currPeice = new RightwardL(gameBoard.width / 2, 0);
+let currPeice = new peices[Math.floor(Math.random() * peices.length - 1)](gameBoard.width / 2, 0);
 const timing = {
-    interval: 500,
+    interval: 1000,
     lastTime: 0,
 };
 addEventListener("keydown", (ev) => {
@@ -40,8 +40,8 @@ function playGame(ctx) {
     const animationLoop = (t) => {
         requestAnimationFrame(animationLoop);
         if (t - timing.lastTime >= timing.interval) {
-            currPeice.clearAbove(ctx);
             currPeice.y += BLOCKH;
+            currPeice.clearAbove(ctx);
             timing.lastTime = t;
         }
         currPeice.draw(ctx);
