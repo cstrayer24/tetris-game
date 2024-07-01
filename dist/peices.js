@@ -15,6 +15,18 @@ class Tetriminoe {
         this.py = y;
         this.color = color;
     }
+    get x() {
+        return this.px;
+    }
+    set x(nx) {
+        this.px = nx;
+    }
+    get y() {
+        return this.py;
+    }
+    set y(ny) {
+        this.py = ny;
+    }
     draw(ctx) {
         this.blks.forEach((v) => drawBlock(v, ctx));
     }
@@ -26,6 +38,9 @@ class Tetriminoe {
     }
     clearLeft(ctx) {
         this.blks.forEach((v) => clearAhead(ctx, v));
+    }
+    dumpBlocks() {
+        return this.blks;
     }
 }
 class Straight extends Tetriminoe {
@@ -238,4 +253,4 @@ class RightwardL extends Tetriminoe {
         this.blks[3].y = this.py + BLOCKH * 2;
     }
 }
-export { Block, Straight, Square, Tri, LeftwardZigZag, RightwardZigZag, LeftwardL, RightwardL, };
+export { Block, Straight, Square, Tri, LeftwardZigZag, RightwardZigZag, LeftwardL, RightwardL, Tetriminoe, };

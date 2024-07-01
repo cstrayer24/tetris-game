@@ -27,6 +27,21 @@ class Tetriminoe {
     this.py = y;
     this.color = color;
   }
+
+  get x() {
+    return this.px;
+  }
+
+  set x(nx) {
+    this.px = nx;
+  }
+  get y() {
+    return this.py;
+  }
+
+  set y(ny) {
+    this.py = ny;
+  }
   draw(ctx: CanvasRenderingContext2D) {
     this.blks.forEach((v) => drawBlock(v, ctx));
   }
@@ -39,6 +54,9 @@ class Tetriminoe {
   }
   clearLeft(ctx: CanvasRenderingContext2D) {
     this.blks.forEach((v) => clearAhead(ctx, v));
+  }
+  dumpBlocks() {
+    return this.blks;
   }
 }
 
@@ -303,4 +321,5 @@ export {
   RightwardZigZag,
   LeftwardL,
   RightwardL,
+  Tetriminoe,
 };
