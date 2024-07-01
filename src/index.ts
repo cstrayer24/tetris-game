@@ -1,3 +1,4 @@
+import { BLOCKH, BLOCKW } from "./constants.js";
 import {
   LeftwardZigZag,
   Square,
@@ -20,37 +21,45 @@ const peices = [
   RightwardL, //needs logic
   LeftwardL, //needs logic
 ];
-// let currPeice = new peices[Math.floor(Math.random() * peices.length)](
-//   gameBoard.width / 2,
-//   0
-// );
-let currPeice = new LeftwardZigZag(gameBoard.width / 2, 0);
+let playingGame = false;
+let currPeice = new RightwardL(gameBoard.width / 2, 0);
+const timing = {
+  interval: 500,
+  lastTime: 0,
+};
 addEventListener("keydown", (ev) => {
   switch (ev.key) {
     case "ArrowRight":
-      currPeice.x += 6;
+      currPeice.x += BLOCKW;
       currPeice.clearRight(ctx);
       break;
     case "ArrowLeft":
-      currPeice.x -= 6;
+      currPeice.x -= BLOCKW;
       currPeice.clearLeft(ctx);
       break;
     case "ArrowDown":
-      currPeice.y += 6;
-      // currPeice.clearAbove(ctx);
+      currPeice.y += BLOCKH;
+      currPeice.clearAbove(ctx);
       break;
     case "ArrowUp":
       break;
   }
 });
 function playGame(ctx: CanvasRenderingContext2D) {
-  let rAF = requestAnimationFrame((t) => playGame(ctx));
-
-  currPeice.clearAbove(ctx);
-  currPeice.y += 1;
-  currPeice.draw(ctx);
+  const animationLoop = (t) => {
+    requestAnimationFrame(animationLoop);
+    if (t - timing.lastTime >= timing.interval) {
+      currPeice.clearAbove(ctx);
+      currPeice.y += BLOCKH;
+      timing.lastTime = t;
+    }
+    currPeice.draw(ctx);
+  };
+  requestAnimationFrame(animationLoop);
 }
 controlButton.addEventListener("click", (ev) => {
-  // playGame(ctx);
-
+  playingGame = !playingGame;
+  if (playingGame) {
+    playGame(ctx);
+  }
 });
