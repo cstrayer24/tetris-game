@@ -1,9 +1,20 @@
-import { BLOCKH, BLOCKW } from "./constants.js";
+import { drawBlock, drawGridLines } from "./drawUtils.js";
+import { updateGrid, createGrid, createGridBoard } from "./grid.js";
 import { LeftwardZigZag, Square, Straight, Tri, RightwardZigZag, LeftwardL, RightwardL, } from "./peices.js";
 import { isAtBottom, isAtRightBarrier, isAtLeftBarrier, hasPieceBellow, hasPieceOnRight, hasPieceOnLeft, } from "./physics.js";
 const gameBoard = document.querySelector("#gamecanvas");
 const ctx = gameBoard.getContext("2d");
 const controlButton = document.querySelector("#ctlbtn");
+let currPeice = getRandomBlock();
+let grid = createGrid(10, 22);
+const droppedPeices = [];
+let playingGame = false;
+let rAf;
+const timing = {
+    interval: 1000,
+    lastTime: 0,
+};
+createGridBoard(gameBoard, grid);
 function getRandomBlock() {
     const peices = [
         LeftwardZigZag,
@@ -14,40 +25,32 @@ function getRandomBlock() {
         RightwardL,
         LeftwardL,
     ];
-    return new peices[Math.floor(Math.random() * peices.length)](gameBoard.width / 2, 0);
+    return new peices[Math.floor(Math.random() * peices.length)](5, 0);
 }
-const droppedPeices = [];
-let playingGame = false;
-let currPeice = getRandomBlock();
-let rAf;
-const timing = {
-    interval: 1000,
-    lastTime: 0,
-};
 addEventListener("keydown", (ev) => {
     switch (ev.key) {
         case "ArrowRight":
-            console.log(!!droppedPeices.find((v) => hasPieceOnRight(v, currPeice)));
-            if (!isAtRightBarrier(ctx, currPeice) &&
-                !droppedPeices.find((v) => hasPieceOnRight(v, currPeice))) {
-                currPeice.x += BLOCKW;
+            if (!isAtRightBarrier(currPeice, grid) &&
+                !hasPieceOnRight(currPeice, grid)) {
+                currPeice.x += 1;
             }
-            currPeice.clearRight(ctx);
+            updateGrid(grid, currPeice);
             break;
         case "ArrowLeft":
-            if (!isAtLeftBarrier(ctx, currPeice) &&
-                !droppedPeices.find((v) => hasPieceOnLeft(v, currPeice))) {
-                currPeice.x -= BLOCKW;
+            if (!isAtLeftBarrier(currPeice, grid) &&
+                !hasPieceOnLeft(currPeice, grid)) {
+                currPeice.x -= 1;
             }
-            currPeice.clearLeft(ctx);
+            updateGrid(grid, currPeice);
             break;
         case "ArrowDown":
-            if (!droppedPeices.find((v) => hasPieceBellow(v, currPeice))) {
-                currPeice.y += BLOCKH;
+            if (!isAtBottom(currPeice, grid) && !hasPieceBellow(currPeice, grid)) {
+                currPeice.y += 1;
             }
-            currPeice.clearAbove(ctx);
+            updateGrid(grid, currPeice);
             break;
         case "ArrowUp":
+            currPeice.rotate();
             break;
     }
 });
@@ -55,22 +58,21 @@ function playGame(ctx) {
     const animationLoop = (t) => {
         rAf = requestAnimationFrame(animationLoop);
         if (t - timing.lastTime >= timing.interval) {
-            currPeice.y += BLOCKH;
-            currPeice.clearAbove(ctx);
+            currPeice.y += 1;
             timing.lastTime = t;
         }
-        if (isAtBottom(ctx, currPeice)) {
-            droppedPeices.push(currPeice);
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        updateGrid(grid, currPeice);
+        if (isAtBottom(currPeice, grid) || hasPieceBellow(currPeice, grid)) {
             currPeice = getRandomBlock();
         }
-        currPeice.draw(ctx);
-        droppedPeices.forEach((v) => {
-            if (hasPieceBellow(currPeice, v)) {
-                droppedPeices.push(currPeice);
-                currPeice = getRandomBlock();
-            }
-            v.draw(ctx);
+        grid.forEach((v1) => {
+            v1.forEach((v2) => {
+                if (typeof v2 !== "undefined")
+                    drawBlock(v2, ctx);
+            });
         });
+        drawGridLines(ctx, grid);
     };
     rAf = requestAnimationFrame(animationLoop);
 }
@@ -78,7 +80,7 @@ function stopGame(ctx) {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     cancelAnimationFrame(rAf);
     currPeice = getRandomBlock();
-    droppedPeices.splice(0, droppedPeices.length);
+    grid = createGrid(10, 22);
 }
 controlButton.addEventListener("click", (ev) => {
     playingGame = !playingGame;
