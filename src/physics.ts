@@ -1,8 +1,9 @@
 import { grid } from "./grid.js";
 import { Tetriminoe } from "./peices.js";
-
+const isAtTop = (piece: Tetriminoe, grid: grid) =>
+  !!piece.dumpBlocks().find((v) => v.y <= 0);
 const isAtBottom = (peice: Tetriminoe, grid: grid) =>
-  peice.dumpBlocks().find((v) => v.y >= grid.length - 1);
+  !!peice.dumpBlocks().find((v) => v.y >= grid.length - 1);
 const isAtRightBarrier = (peice: Tetriminoe, grid: grid) =>
   !!peice.dumpBlocks().find((v) => v.x >= grid[0].length - 1);
 
@@ -55,6 +56,7 @@ const hasPieceOnLeft = (piece: Tetriminoe, grid: grid) => {
 };
 export {
   isAtBottom,
+  isAtTop,
   isAtRightBarrier,
   isAtLeftBarrier,
   hasPieceBellow,

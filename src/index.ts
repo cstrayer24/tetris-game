@@ -19,6 +19,7 @@ import {
   hasPieceBellow,
   hasPieceOnRight,
   hasPieceOnLeft,
+  isAtTop,
 } from "./physics.js";
 
 const gameBoard: HTMLCanvasElement = document.querySelector("#gamecanvas");
@@ -77,6 +78,22 @@ addEventListener("keydown", (ev) => {
       break;
     case "ArrowUp":
       currPeice.rotate();
+      if (isAtLeftBarrier(currPeice, grid) || hasPieceOnLeft(currPeice, grid)) {
+        currPeice.x += 1;
+      }
+      if (
+        isAtRightBarrier(currPeice, grid) ||
+        hasPieceOnRight(currPeice, grid)
+      ) {
+        currPeice.x -= 1;
+      }
+      if (isAtBottom(currPeice, grid) || hasPieceBellow(currPeice, grid)) {
+        currPeice.y -= 1;
+      }
+      if (isAtTop(currPeice, grid)) {
+        currPeice.y += 1;
+      }
+      updateGrid(grid, currPeice);
       break;
   }
 });

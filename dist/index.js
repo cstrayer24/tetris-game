@@ -1,7 +1,7 @@
 import { drawBlock, drawGridLines } from "./drawUtils.js";
 import { updateGrid, createGrid, createGridBoard } from "./grid.js";
 import { LeftwardZigZag, Square, Straight, Tri, RightwardZigZag, LeftwardL, RightwardL, } from "./peices.js";
-import { isAtBottom, isAtRightBarrier, isAtLeftBarrier, hasPieceBellow, hasPieceOnRight, hasPieceOnLeft, } from "./physics.js";
+import { isAtBottom, isAtRightBarrier, isAtLeftBarrier, hasPieceBellow, hasPieceOnRight, hasPieceOnLeft, isAtTop, } from "./physics.js";
 const gameBoard = document.querySelector("#gamecanvas");
 const ctx = gameBoard.getContext("2d");
 const controlButton = document.querySelector("#ctlbtn");
@@ -51,6 +51,20 @@ addEventListener("keydown", (ev) => {
             break;
         case "ArrowUp":
             currPeice.rotate();
+            if (isAtLeftBarrier(currPeice, grid) || hasPieceOnLeft(currPeice, grid)) {
+                currPeice.x += 1;
+            }
+            if (isAtRightBarrier(currPeice, grid) ||
+                hasPieceOnRight(currPeice, grid)) {
+                currPeice.x -= 1;
+            }
+            if (isAtBottom(currPeice, grid) || hasPieceBellow(currPeice, grid)) {
+                currPeice.y -= 1;
+            }
+            if (isAtTop(currPeice, grid)) {
+                currPeice.y += 1;
+            }
+            updateGrid(grid, currPeice);
             break;
     }
 });

@@ -1,4 +1,5 @@
-const isAtBottom = (peice, grid) => peice.dumpBlocks().find((v) => v.y >= grid.length - 1);
+const isAtTop = (piece, grid) => !!piece.dumpBlocks().find((v) => v.y <= 0);
+const isAtBottom = (peice, grid) => !!peice.dumpBlocks().find((v) => v.y >= grid.length - 1);
 const isAtRightBarrier = (peice, grid) => !!peice.dumpBlocks().find((v) => v.x >= grid[0].length - 1);
 const isAtLeftBarrier = (peice, grid) => !!peice.dumpBlocks().find((v) => v.x <= 0);
 const hasPieceBellow = (peice, grid) => {
@@ -34,4 +35,4 @@ const hasPieceOnLeft = (piece, grid) => {
     });
     return isTouching;
 };
-export { isAtBottom, isAtRightBarrier, isAtLeftBarrier, hasPieceBellow, hasPieceOnRight, hasPieceOnLeft, };
+export { isAtBottom, isAtTop, isAtRightBarrier, isAtLeftBarrier, hasPieceBellow, hasPieceOnRight, hasPieceOnLeft, };
