@@ -70,15 +70,11 @@ function handleInput(Game, ev) {
     }
 }
 function bindEvents(Game) {
-    if (!Game.hasEvents) {
-        addEventListener("keydown", (ev) => handleInput(Game, ev));
-    }
+    window.onkeydown = (ev) => handleInput(Game, ev);
     Game.hasEvents = true;
 }
 function releaseEvents(Game) {
-    if (Game.hasEvents) {
-        removeEventListener("keydown", (ev) => handleInput(Game, ev));
-    }
+    window.onkeydown = (ev) => handleInput(Game, ev);
     Game.hasEvents = false;
 }
 function renderGame(Game) {
