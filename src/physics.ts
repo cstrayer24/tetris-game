@@ -11,12 +11,11 @@ const isAtLeftBarrier = (peice: Tetriminoe, grid: grid) =>
   !!peice.blks.find((v) => v.x <= 0);
 const hasPieceBellow = (peice: Tetriminoe, grid: grid) => {
   let isTouching = false;
-  const sortedBlocks = structuredClone(peice.blks).sort((a, b) => a.y - b.y);
-  const lowestBlocks = sortedBlocks.filter(
-    (v) => sortedBlocks[sortedBlocks.length - 1].y <= v.y
-  );
-  lowestBlocks.forEach((v) => {
-    if (typeof grid[v.y + 1][v.x] !== "undefined") {
+  peice.blks.forEach((v) => {
+    if (
+      typeof grid[v.y + 1][v.x] !== "undefined" &&
+      !peice.blks.includes(grid[v.y + 1][v.x])
+    ) {
       isTouching = true;
     }
   });

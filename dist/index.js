@@ -21,7 +21,6 @@ function initGame(Game, canvas) {
     Game.gameBoard = canvas;
     Game.ctx = Game.gameBoard.getContext("2d");
     createGridBoard(Game.gameBoard, Game.grid);
-    Game;
     Game.isPlaying = false;
     Game.timing = {
         interval: 1000,
