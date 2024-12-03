@@ -41,7 +41,7 @@ class Block {
 class Tetriminoe {
   protected px: number;
   protected py: number;
-  protected blks: Block[];
+  blks: Block[];
   protected internalGrid: grid;
   color: string;
   protected constructor(x: number, y: number, color: string) {
@@ -67,9 +67,6 @@ class Tetriminoe {
   }
   draw(ctx: CanvasRenderingContext2D) {
     this.blks.forEach((v) => drawBlock(v, ctx));
-  }
-  dumpBlocks() {
-    return this.blks;
   }
 
   rotate() {

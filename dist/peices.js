@@ -34,9 +34,6 @@ class Tetriminoe {
     draw(ctx) {
         this.blks.forEach((v) => drawBlock(v, ctx));
     }
-    dumpBlocks() {
-        return this.blks;
-    }
     rotate() {
         return;
     }

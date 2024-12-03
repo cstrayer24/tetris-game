@@ -27,5 +27,14 @@ const clearAhead = (ctx: CanvasRenderingContext2D, block: Block) =>
   ctx.clearRect(block.x + block.w, block.y, block.w, block.h);
 const clearAbove = (ctx: CanvasRenderingContext2D, block: Block) =>
   ctx.clearRect(block.x, block.y - block.h, block.w, block.h);
+const clrscrn = (ctx: CanvasRenderingContext2D) =>
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-export { clearBehind, clearAhead, clearAbove, drawBlock, drawGridLines };
+export {
+  clearBehind,
+  clearAhead,
+  clearAbove,
+  drawBlock,
+  drawGridLines,
+  clrscrn,
+};

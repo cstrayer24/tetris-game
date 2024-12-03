@@ -1,20 +1,9 @@
-import { drawBlock, drawGridLines } from "./drawUtils.js";
-import { updateGrid, createGrid, createGridBoard } from "./grid.js";
+import { clrscrn, drawBlock, drawGridLines } from "./drawUtils.js";
+import { updateGrid, createGrid, createGridBoard, clearGrid, } from "./grid.js";
 import { LeftwardZigZag, Square, Straight, Tri, RightwardZigZag, LeftwardL, RightwardL, } from "./peices.js";
 import { isAtBottom, isAtRightBarrier, isAtLeftBarrier, hasPieceBellow, hasPieceOnRight, hasPieceOnLeft, isAtTop, } from "./physics.js";
-const gameBoard = document.querySelector("#gamecanvas");
-const ctx = gameBoard.getContext("2d");
+const Game = {};
 const controlButton = document.querySelector("#ctlbtn");
-let currPeice = getRandomBlock();
-let grid = createGrid(10, 22);
-const droppedPeices = [];
-let playingGame = false;
-let rAf;
-const timing = {
-    interval: 1000,
-    lastTime: 0,
-};
-createGridBoard(gameBoard, grid);
 function getRandomBlock() {
     const peices = [
         LeftwardZigZag,
@@ -27,7 +16,20 @@ function getRandomBlock() {
     ];
     return new peices[Math.floor(Math.random() * peices.length)](5, 0);
 }
-addEventListener("keydown", (ev) => {
+function initGame(Game, canvas) {
+    Game.grid = createGrid(10, 22);
+    Game.gameBoard = canvas;
+    Game.ctx = Game.gameBoard.getContext("2d");
+    createGridBoard(Game.gameBoard, Game.grid);
+    Game;
+    Game.isPlaying = false;
+    Game.timing = {
+        interval: 1000,
+        lastTime: 0,
+    };
+}
+function handleInput(Game, ev) {
+    const { currPeice, grid } = Game;
     switch (ev.key) {
         case "ArrowRight":
             if (!isAtRightBarrier(currPeice, grid) &&
@@ -67,43 +69,67 @@ addEventListener("keydown", (ev) => {
             updateGrid(grid, currPeice);
             break;
     }
-});
-function playGame(ctx) {
-    const animationLoop = (t) => {
-        rAf = requestAnimationFrame(animationLoop);
-        if (t - timing.lastTime >= timing.interval) {
-            currPeice.y += 1;
-            timing.lastTime = t;
-        }
-        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-        updateGrid(grid, currPeice);
-        if (isAtBottom(currPeice, grid) || hasPieceBellow(currPeice, grid)) {
-            currPeice = getRandomBlock();
-        }
-        grid.forEach((v1) => {
-            v1.forEach((v2) => {
-                if (typeof v2 !== "undefined")
-                    drawBlock(v2, ctx);
-            });
+}
+function bindEvents(Game) {
+    if (!Game.hasEvents) {
+        addEventListener("keydown", (ev) => handleInput(Game, ev));
+    }
+    Game.hasEvents = true;
+}
+function releaseEvents(Game) {
+    if (Game.hasEvents) {
+        removeEventListener("keydown", (ev) => handleInput(Game, ev));
+    }
+    Game.hasEvents = false;
+}
+function renderGame(Game) {
+    Game.grid.forEach((v1) => {
+        v1.forEach((v2) => {
+            if (typeof v2 !== "undefined")
+                drawBlock(v2, Game.ctx);
         });
-        drawGridLines(ctx, grid);
+    });
+    drawGridLines(Game.ctx, Game.grid);
+}
+function playGame(Game) {
+    Game.isPlaying = true;
+    Game.currPeice = getRandomBlock();
+    bindEvents(Game);
+    const animationLoop = (t) => {
+        Game.frameRef = requestAnimationFrame(animationLoop);
+        if (t - Game.timing.lastTime >= Game.timing.interval) {
+            Game.currPeice.y += 1;
+            Game.timing.lastTime = t;
+        }
+        clrscrn(Game.ctx);
+        updateGrid(Game.grid, Game.currPeice);
+        if (isAtBottom(Game.currPeice, Game.grid) ||
+            hasPieceBellow(Game.currPeice, Game.grid)) {
+            Game.currPeice = getRandomBlock();
+        }
+        renderGame(Game);
     };
-    rAf = requestAnimationFrame(animationLoop);
+    Game.frameRef = requestAnimationFrame(animationLoop);
 }
-function stopGame(ctx) {
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    cancelAnimationFrame(rAf);
-    currPeice = getRandomBlock();
-    grid = createGrid(10, 22);
+function stopGame(Game) {
+    cancelAnimationFrame(Game.frameRef);
+    Game.isPlaying = false;
+    Game.currPeice = null;
+    releaseEvents(Game);
+    clearGrid(Game.grid);
+    clrscrn(Game.ctx);
 }
+window.addEventListener("DOMContentLoaded", (ev) => {
+    initGame(Game, document.querySelector("#gamecanvas"));
+});
 controlButton.addEventListener("click", (ev) => {
-    playingGame = !playingGame;
-    if (playingGame) {
-        playGame(ctx);
+    Game.isPlaying = !Game.isPlaying;
+    if (Game.isPlaying) {
+        playGame(Game);
         controlButton.innerText = "stop";
     }
     else {
-        stopGame(ctx);
+        stopGame(Game);
         controlButton.innerText = "start";
     }
 });

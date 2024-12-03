@@ -21,4 +21,5 @@ function drawGridLines(ctx, grid) {
 const clearBehind = (ctx, block) => ctx.clearRect(block.x - block.w, block.y, block.w, block.h);
 const clearAhead = (ctx, block) => ctx.clearRect(block.x + block.w, block.y, block.w, block.h);
 const clearAbove = (ctx, block) => ctx.clearRect(block.x, block.y - block.h, block.w, block.h);
-export { clearBehind, clearAhead, clearAbove, drawBlock, drawGridLines };
+const clrscrn = (ctx) => ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+export { clearBehind, clearAhead, clearAbove, drawBlock, drawGridLines, clrscrn, };

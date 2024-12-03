@@ -1,19 +1,17 @@
 import { grid } from "./grid.js";
 import { Tetriminoe } from "./peices.js";
 const isAtTop = (piece: Tetriminoe, grid: grid) =>
-  !!piece.dumpBlocks().find((v) => v.y <= 0);
+  !!piece.blks.find((v) => v.y <= 0);
 const isAtBottom = (peice: Tetriminoe, grid: grid) =>
-  !!peice.dumpBlocks().find((v) => v.y >= grid.length - 1);
+  !!peice.blks.find((v) => v.y >= grid.length - 1);
 const isAtRightBarrier = (peice: Tetriminoe, grid: grid) =>
-  !!peice.dumpBlocks().find((v) => v.x >= grid[0].length - 1);
+  !!peice.blks.find((v) => v.x >= grid[0].length - 1);
 
 const isAtLeftBarrier = (peice: Tetriminoe, grid: grid) =>
-  !!peice.dumpBlocks().find((v) => v.x <= 0);
+  !!peice.blks.find((v) => v.x <= 0);
 const hasPieceBellow = (peice: Tetriminoe, grid: grid) => {
   let isTouching = false;
-  const sortedBlocks = structuredClone(peice.dumpBlocks()).sort(
-    (a, b) => a.y - b.y
-  );
+  const sortedBlocks = structuredClone(peice.blks).sort((a, b) => a.y - b.y);
   const lowestBlocks = sortedBlocks.filter(
     (v) => sortedBlocks[sortedBlocks.length - 1].y <= v.y
   );
@@ -27,9 +25,7 @@ const hasPieceBellow = (peice: Tetriminoe, grid: grid) => {
 
 const hasPieceOnRight = (piece: Tetriminoe, grid: grid) => {
   let isTouching = false;
-  const sortedBlocks = structuredClone(piece.dumpBlocks()).sort(
-    (a, b) => a.x - b.x
-  );
+  const sortedBlocks = structuredClone(piece.blks).sort((a, b) => a.x - b.x);
   const rightMostBlocks = sortedBlocks.filter(
     (v) => sortedBlocks[sortedBlocks.length - 1].x <= v.x
   );
@@ -43,9 +39,7 @@ const hasPieceOnRight = (piece: Tetriminoe, grid: grid) => {
 
 const hasPieceOnLeft = (piece: Tetriminoe, grid: grid) => {
   let isTouching = false;
-  const sortedBlocks = structuredClone(piece.dumpBlocks()).sort(
-    (a, b) => a.x - b.x
-  );
+  const sortedBlocks = structuredClone(piece.blks).sort((a, b) => a.x - b.x);
   const leftMostBlocks = sortedBlocks.filter((v) => sortedBlocks[0].x >= v.x);
   leftMostBlocks.forEach((v) => {
     if (typeof grid[v.y][v.x - 1] !== "undefined") {
