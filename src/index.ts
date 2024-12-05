@@ -139,6 +139,9 @@ function playGame(Game: game) {
   Game.currPeice = getRandomBlock();
   bindEvents(Game);
   const animationLoop = (t) => {
+    if (!Game.isPlaying) {
+      return;
+    }
     Game.frameRef = requestAnimationFrame(animationLoop);
     if (t - Game.timing.lastTime >= Game.timing.interval) {
       Game.currPeice.y += 1;
@@ -146,13 +149,22 @@ function playGame(Game: game) {
     }
     clrscrn(Game.ctx);
     updateGrid(Game.grid, Game.currPeice);
+    renderGame(Game);
+
     if (
       isAtBottom(Game.currPeice, Game.grid) ||
       hasPieceBellow(Game.currPeice, Game.grid)
     ) {
       Game.currPeice = getRandomBlock();
     }
-    renderGame(Game);
+
+    if (
+      isAtTop(Game.currPeice, Game.grid) &&
+      hasPieceBellow(Game.currPeice, Game.grid)
+    ) {
+      updateGrid(Game.grid, Game.currPeice);
+      return doGameOver(Game);
+    }
   };
   Game.frameRef = requestAnimationFrame(animationLoop);
 }
@@ -163,6 +175,25 @@ function stopGame(Game: game) {
   releaseEvents(Game);
   clearGrid(Game.grid);
   clrscrn(Game.ctx);
+}
+function resetGame(Game: game) {
+  stopGame(Game);
+  playGame(Game);
+}
+function doGameOver(Game: game) {
+  const gameOverContainer: HTMLDivElement =
+    document.querySelector("#gameOverUi");
+  const resetBtn: HTMLButtonElement = document.querySelector("#resetBtn");
+  const ctlButton: HTMLButtonElement = document.querySelector("#ctlbtn");
+  ctlButton.disabled = true;
+  Game.isPlaying = false;
+  gameOverContainer.style.display = "grid";
+  renderGame(Game);
+  resetBtn.onclick = (ev) => {
+    resetGame(Game);
+    ctlButton.disabled = false;
+    gameOverContainer.style.display = "none";
+  };
 }
 window.addEventListener("DOMContentLoaded", (ev) => {
   initGame(Game, document.querySelector("#gamecanvas"));
