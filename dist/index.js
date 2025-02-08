@@ -1,7 +1,7 @@
 import { clrscrn, drawBlock, drawGridLines } from "./drawUtils.js";
 import { updateGrid, createGrid, createGridBoard, clearGrid, } from "./grid.js";
 import { LeftwardZigZag, Square, Straight, Tri, RightwardZigZag, LeftwardL, RightwardL, } from "./peices.js";
-import { isAtBottom, isAtRightBarrier, isAtLeftBarrier, hasPieceBellow, hasPieceOnRight, hasPieceOnLeft, isAtTop, } from "./physics.js";
+import { isAtBottom, isAtRightBarrier, isAtLeftBarrier, hasPieceBellow, hasPieceOnRight, hasPieceOnLeft, isAtTop, dropBlocks, } from "./physics.js";
 const Game = {};
 const controlButton = document.querySelector("#ctlbtn");
 function getRandomBlock() {
@@ -16,6 +16,9 @@ function getRandomBlock() {
     ];
     return new peices[Math.floor(Math.random() * peices.length)](5, 0);
 }
+function updateScoreBoard(Game) {
+    Game.scoreBoard.textContent = `${Game.score}`;
+}
 function initGame(Game, canvas) {
     Game.grid = createGrid(10, 22);
     Game.gameBoard = canvas;
@@ -26,6 +29,10 @@ function initGame(Game, canvas) {
         interval: 1000,
         lastTime: 0,
     };
+    Game.scoreBoard = document.querySelector("#scoreBoard");
+    Game.score = 0;
+    Game.scoreMultiplier = 1;
+    Game.linesCleared = 0;
 }
 function handleInput(Game, ev) {
     const { currPeice, grid } = Game;
@@ -47,6 +54,8 @@ function handleInput(Game, ev) {
         case "ArrowDown":
             if (!isAtBottom(currPeice, grid) && !hasPieceBellow(currPeice, grid)) {
                 currPeice.y += 1;
+                Game.score += 1;
+                updateScoreBoard(Game);
             }
             updateGrid(grid, currPeice);
             break;
@@ -74,7 +83,7 @@ function bindEvents(Game) {
     Game.hasEvents = true;
 }
 function releaseEvents(Game) {
-    window.onkeydown = (ev) => handleInput(Game, ev);
+    window.onkeydown = (ev) => undefined;
     Game.hasEvents = false;
 }
 function renderGame(Game) {
@@ -105,6 +114,14 @@ function playGame(Game) {
         if (isAtBottom(Game.currPeice, Game.grid) ||
             hasPieceBellow(Game.currPeice, Game.grid)) {
             Game.currPeice = getRandomBlock();
+            const filledRows = Game.grid.filter((v) => !v.includes(undefined));
+            for (let i = 0; i < filledRows.length; i++) {
+                const blk = filledRows[i][0];
+                Game.grid[blk.y] = Game.grid[blk.y].map((v, i) => undefined);
+            }
+            if (filledRows.length > 0) {
+                dropBlocks(Game.grid, filledRows.length);
+            }
         }
         if (isAtTop(Game.currPeice, Game.grid) &&
             hasPieceBellow(Game.currPeice, Game.grid)) {
@@ -115,6 +132,10 @@ function playGame(Game) {
     Game.frameRef = requestAnimationFrame(animationLoop);
 }
 function stopGame(Game) {
+    Game.score = 0;
+    Game.scoreMultiplier = 1;
+    Game.linesCleared = 0;
+    updateScoreBoard(Game);
     cancelAnimationFrame(Game.frameRef);
     Game.isPlaying = false;
     Game.currPeice = null;
@@ -130,8 +151,10 @@ function doGameOver(Game) {
     const gameOverContainer = document.querySelector("#gameOverUi");
     const resetBtn = document.querySelector("#resetBtn");
     const ctlButton = document.querySelector("#ctlbtn");
+    const finalGameScore = document.querySelector("#finalGameScore");
     ctlButton.disabled = true;
     Game.isPlaying = false;
+    finalGameScore.innerText = `score:${Game.score}`;
     gameOverContainer.style.display = "grid";
     renderGame(Game);
     resetBtn.onclick = (ev) => {

@@ -24,6 +24,7 @@ import {
   hasPieceOnRight,
   hasPieceOnLeft,
   isAtTop,
+  dropBlocks,
 } from "./physics.js";
 type timing_t = {
   interval: number;
@@ -38,6 +39,10 @@ type game = {
   ctx: CanvasRenderingContext2D;
   timing: timing_t;
   hasEvents: boolean;
+  scoreBoard: Element;
+  score: number;
+  linesCleared: number;
+  scoreMultiplier: number;
 };
 
 const Game: game = {} as game;
@@ -55,6 +60,10 @@ function getRandomBlock(): Tetriminoe {
   ];
   return new peices[Math.floor(Math.random() * peices.length)](5, 0);
 }
+
+function updateScoreBoard(Game: game) {
+  Game.scoreBoard.textContent = `${Game.score}`;
+}
 function initGame(Game: game, canvas: HTMLCanvasElement) {
   Game.grid = createGrid(10, 22);
   Game.gameBoard = canvas;
@@ -65,6 +74,10 @@ function initGame(Game: game, canvas: HTMLCanvasElement) {
     interval: 1000,
     lastTime: 0,
   };
+  Game.scoreBoard = document.querySelector("#scoreBoard");
+  Game.score = 0;
+  Game.scoreMultiplier = 1;
+  Game.linesCleared = 0;
 }
 
 function handleInput(Game: game, ev: KeyboardEvent) {
@@ -91,6 +104,8 @@ function handleInput(Game: game, ev: KeyboardEvent) {
     case "ArrowDown":
       if (!isAtBottom(currPeice, grid) && !hasPieceBellow(currPeice, grid)) {
         currPeice.y += 1;
+        Game.score += 1;
+        updateScoreBoard(Game);
       }
       updateGrid(grid, currPeice);
 
@@ -123,7 +138,7 @@ function bindEvents(Game: game) {
 }
 
 function releaseEvents(Game: game) {
-  window.onkeydown = (ev) => handleInput(Game, ev);
+  window.onkeydown = (ev) => undefined;
   Game.hasEvents = false;
 }
 function renderGame(Game: game) {
@@ -156,6 +171,14 @@ function playGame(Game: game) {
       hasPieceBellow(Game.currPeice, Game.grid)
     ) {
       Game.currPeice = getRandomBlock();
+      const filledRows = Game.grid.filter((v) => !v.includes(undefined));
+      for (let i = 0; i < filledRows.length; i++) {
+        const blk = filledRows[i][0];
+        Game.grid[blk.y] = Game.grid[blk.y].map((v, i) => undefined);
+      }
+      if (filledRows.length > 0) {
+        dropBlocks(Game.grid, filledRows.length);
+      }
     }
 
     if (
@@ -169,6 +192,10 @@ function playGame(Game: game) {
   Game.frameRef = requestAnimationFrame(animationLoop);
 }
 function stopGame(Game: game) {
+  Game.score = 0;
+  Game.scoreMultiplier = 1;
+  Game.linesCleared = 0;
+  updateScoreBoard(Game);
   cancelAnimationFrame(Game.frameRef);
   Game.isPlaying = false;
   Game.currPeice = null;
@@ -185,8 +212,11 @@ function doGameOver(Game: game) {
     document.querySelector("#gameOverUi");
   const resetBtn: HTMLButtonElement = document.querySelector("#resetBtn");
   const ctlButton: HTMLButtonElement = document.querySelector("#ctlbtn");
+  const finalGameScore: HTMLHeadElement =
+    document.querySelector("#finalGameScore");
   ctlButton.disabled = true;
   Game.isPlaying = false;
+  finalGameScore.innerText = `score:${Game.score}`;
   gameOverContainer.style.display = "grid";
   renderGame(Game);
   resetBtn.onclick = (ev) => {

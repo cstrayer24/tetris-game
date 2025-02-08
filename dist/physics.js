@@ -34,4 +34,39 @@ const hasPieceOnLeft = (piece, grid) => {
     });
     return isTouching;
 };
-export { isAtBottom, isAtTop, isAtRightBarrier, isAtLeftBarrier, hasPieceBellow, hasPieceOnRight, hasPieceOnLeft, };
+function dropBlocks(grid, numClearedRows) {
+    if (grid.every((row) => row.every((blk) => blk === undefined))) {
+        return;
+    }
+    let bottomMostEmptyRow = grid.findLastIndex((row) => row.every((blk) => blk === undefined));
+    let topMostNonEmptyRow = grid.findIndex((row) => !row.every((blk) => blk === undefined));
+    let nonEmptyRow = bottomMostEmptyRow - numClearedRows;
+    const nonEmptyRows = [];
+    while (topMostNonEmptyRow < bottomMostEmptyRow) {
+        if (grid[nonEmptyRow].every((blk) => blk === undefined)) {
+            nonEmptyRows.unshift(nonEmptyRow);
+            const pullDownAmnt = numClearedRows;
+            let i = 0;
+            while (nonEmptyRows.length != 0) {
+                const currRow = nonEmptyRows.pop();
+                for (let j = 0; j < grid[currRow].length; j++) {
+                    if (grid[currRow][j] === undefined) {
+                        continue;
+                    }
+                    const currBlock = grid[currRow][j];
+                    currBlock.y += pullDownAmnt;
+                    grid[currBlock.y][currBlock.x] = currBlock;
+                }
+                i++;
+            }
+            bottomMostEmptyRow = grid.findLastIndex((row) => row.every((blk) => blk === undefined));
+            topMostNonEmptyRow = grid.findIndex((row) => !row.every((blk) => blk === undefined));
+            nonEmptyRow = bottomMostEmptyRow - numClearedRows;
+        }
+        else {
+            nonEmptyRows.unshift(nonEmptyRow);
+            nonEmptyRow--;
+        }
+    }
+}
+export { isAtBottom, isAtTop, isAtRightBarrier, isAtLeftBarrier, hasPieceBellow, hasPieceOnRight, hasPieceOnLeft, dropBlocks, };

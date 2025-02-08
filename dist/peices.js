@@ -2,6 +2,13 @@ import { BLOCKH, BLOCKW, IGRIDH, IGRIDW } from "./constants.js";
 import { drawBlock } from "./drawUtils.js";
 import { createGrid, scaleInternalToGameboardGrid, updateGrid, setBlockPosToInternalGridPos, swapRowsAndCols, reverseRows, } from "./grid.js";
 class Block {
+    x;
+    y;
+    ix;
+    iy;
+    w;
+    h;
+    color;
     constructor(x, y, ix, iy, w, h, color) {
         this.color = color;
         this.h = h;
@@ -13,6 +20,11 @@ class Block {
     }
 }
 class Tetriminoe {
+    px;
+    py;
+    blks;
+    internalGrid;
+    color;
     constructor(x, y, color) {
         this.px = x;
         this.py = y;

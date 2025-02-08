@@ -1,14 +1,15 @@
 import { grid } from "./grid.js";
 import { Tetriminoe } from "./peices.js";
+
 const isAtTop = (piece: Tetriminoe, grid: grid) =>
   !!piece.blks.find((v) => v.y <= 0);
 const isAtBottom = (peice: Tetriminoe, grid: grid) =>
   !!peice.blks.find((v) => v.y >= grid.length - 1);
 const isAtRightBarrier = (peice: Tetriminoe, grid: grid) =>
   !!peice.blks.find((v) => v.x >= grid[0].length - 1);
-
 const isAtLeftBarrier = (peice: Tetriminoe, grid: grid) =>
   !!peice.blks.find((v) => v.x <= 0);
+
 const hasPieceBellow = (peice: Tetriminoe, grid: grid) => {
   let isTouching = false;
   peice.blks.forEach((v) => {
@@ -47,6 +48,52 @@ const hasPieceOnLeft = (piece: Tetriminoe, grid: grid) => {
   });
   return isTouching;
 };
+
+function dropBlocks(grid: grid, numClearedRows: number) {
+  if (grid.every((row) => row.every((blk) => blk === undefined))) {
+    return;
+  }
+  let bottomMostEmptyRow = grid.findLastIndex((row) =>
+    row.every((blk) => blk === undefined)
+  );
+  let topMostNonEmptyRow = grid.findIndex(
+    (row) => !row.every((blk) => blk === undefined)
+  );
+  let nonEmptyRow = bottomMostEmptyRow - numClearedRows;
+  const nonEmptyRows = [];
+
+  while (topMostNonEmptyRow < bottomMostEmptyRow) {
+    if (grid[nonEmptyRow].every((blk) => blk === undefined)) {
+      nonEmptyRows.unshift(nonEmptyRow);
+
+      const pullDownAmnt = numClearedRows;
+      let i = 0;
+      while (nonEmptyRows.length != 0) {
+        const currRow = nonEmptyRows.pop();
+        for (let j = 0; j < grid[currRow].length; j++) {
+          if (grid[currRow][j] === undefined) {
+            continue;
+          }
+
+          const currBlock = grid[currRow][j];
+          currBlock.y += pullDownAmnt;
+          grid[currBlock.y][currBlock.x] = currBlock;
+        }
+        i++;
+      }
+      bottomMostEmptyRow = grid.findLastIndex((row) =>
+        row.every((blk) => blk === undefined)
+      );
+      topMostNonEmptyRow = grid.findIndex(
+        (row) => !row.every((blk) => blk === undefined)
+      );
+      nonEmptyRow = bottomMostEmptyRow - numClearedRows;
+    } else {
+      nonEmptyRows.unshift(nonEmptyRow);
+      nonEmptyRow--;
+    }
+  }
+}
 export {
   isAtBottom,
   isAtTop,
@@ -55,4 +102,5 @@ export {
   hasPieceBellow,
   hasPieceOnRight,
   hasPieceOnLeft,
+  dropBlocks,
 };
