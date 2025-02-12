@@ -25,6 +25,7 @@ import {
   hasPieceOnLeft,
   isAtTop,
   dropBlocks,
+  dropPeice,
 } from "./physics.js";
 type timing_t = {
   interval: number;
@@ -43,6 +44,7 @@ type game = {
   score: number;
   linesCleared: number;
   scoreMultiplier: number;
+  nextLineThreshold: number;
 };
 
 const Game: game = {} as game;
@@ -71,13 +73,14 @@ function initGame(Game: game, canvas: HTMLCanvasElement) {
   createGridBoard(Game.gameBoard, Game.grid);
   Game.isPlaying = false;
   Game.timing = {
-    interval: 1000,
+    interval: 800,
     lastTime: 0,
   };
   Game.scoreBoard = document.querySelector("#scoreBoard");
   Game.score = 0;
   Game.scoreMultiplier = 1;
   Game.linesCleared = 0;
+  Game.nextLineThreshold = 10;
 }
 
 function handleInput(Game: game, ev: KeyboardEvent) {
@@ -129,6 +132,10 @@ function handleInput(Game: game, ev: KeyboardEvent) {
       }
       updateGrid(grid, currPeice);
       break;
+    case " ":
+      Game.score += dropPeice(Game.currPeice, Game.grid);
+      updateScoreBoard(Game);
+      break;
   }
 }
 
@@ -141,6 +148,7 @@ function releaseEvents(Game: game) {
   window.onkeydown = (ev) => undefined;
   Game.hasEvents = false;
 }
+
 function renderGame(Game: game) {
   Game.grid.forEach((v1) => {
     v1.forEach((v2) => {
@@ -149,9 +157,11 @@ function renderGame(Game: game) {
   });
   drawGridLines(Game.ctx, Game.grid);
 }
+
 function playGame(Game: game) {
   Game.isPlaying = true;
   Game.currPeice = getRandomBlock();
+
   bindEvents(Game);
   const animationLoop = (t) => {
     if (!Game.isPlaying) {
@@ -178,9 +188,17 @@ function playGame(Game: game) {
       }
       if (filledRows.length > 0) {
         dropBlocks(Game.grid, filledRows.length);
+        Game.linesCleared += filledRows.length;
+        Game.score += filledRows.length * 100 * Game.scoreMultiplier;
+        updateScoreBoard(Game);
       }
     }
-
+    if (Game.linesCleared >= Game.nextLineThreshold) {
+      Game.scoreMultiplier += 1;
+      Game.nextLineThreshold += 10;
+      Game.timing.interval =
+        (Math.max(48 - 5 * Game.scoreMultiplier, 1) / 60) * 1000;
+    }
     if (
       isAtTop(Game.currPeice, Game.grid) &&
       hasPieceBellow(Game.currPeice, Game.grid)
@@ -191,10 +209,13 @@ function playGame(Game: game) {
   };
   Game.frameRef = requestAnimationFrame(animationLoop);
 }
+
 function stopGame(Game: game) {
   Game.score = 0;
   Game.scoreMultiplier = 1;
   Game.linesCleared = 0;
+  Game.nextLineThreshold = 10;
+  Game.timing.interval = 800;
   updateScoreBoard(Game);
   cancelAnimationFrame(Game.frameRef);
   Game.isPlaying = false;
@@ -203,10 +224,12 @@ function stopGame(Game: game) {
   clearGrid(Game.grid);
   clrscrn(Game.ctx);
 }
+
 function resetGame(Game: game) {
   stopGame(Game);
   playGame(Game);
 }
+
 function doGameOver(Game: game) {
   const gameOverContainer: HTMLDivElement =
     document.querySelector("#gameOverUi");
@@ -225,9 +248,11 @@ function doGameOver(Game: game) {
     gameOverContainer.style.display = "none";
   };
 }
+
 window.addEventListener("DOMContentLoaded", (ev) => {
   initGame(Game, document.querySelector("#gamecanvas"));
 });
+
 controlButton.addEventListener("click", (ev) => {
   Game.isPlaying = !Game.isPlaying;
   if (Game.isPlaying) {

@@ -42,11 +42,11 @@ function dropBlocks(grid, numClearedRows) {
     let topMostNonEmptyRow = grid.findIndex((row) => !row.every((blk) => blk === undefined));
     let nonEmptyRow = bottomMostEmptyRow - numClearedRows;
     const nonEmptyRows = [];
+    let iterCount = 0;
     while (topMostNonEmptyRow < bottomMostEmptyRow) {
         if (grid[nonEmptyRow].every((blk) => blk === undefined)) {
             nonEmptyRows.unshift(nonEmptyRow);
             const pullDownAmnt = numClearedRows;
-            let i = 0;
             while (nonEmptyRows.length != 0) {
                 const currRow = nonEmptyRows.pop();
                 for (let j = 0; j < grid[currRow].length; j++) {
@@ -57,7 +57,6 @@ function dropBlocks(grid, numClearedRows) {
                     currBlock.y += pullDownAmnt;
                     grid[currBlock.y][currBlock.x] = currBlock;
                 }
-                i++;
             }
             bottomMostEmptyRow = grid.findLastIndex((row) => row.every((blk) => blk === undefined));
             topMostNonEmptyRow = grid.findIndex((row) => !row.every((blk) => blk === undefined));
@@ -67,6 +66,18 @@ function dropBlocks(grid, numClearedRows) {
             nonEmptyRows.unshift(nonEmptyRow);
             nonEmptyRow--;
         }
+        iterCount++;
+        if (iterCount >= 100) {
+            break;
+        }
     }
 }
-export { isAtBottom, isAtTop, isAtRightBarrier, isAtLeftBarrier, hasPieceBellow, hasPieceOnRight, hasPieceOnLeft, dropBlocks, };
+function dropPeice(peice, grid) {
+    let rowsDropped = 0;
+    while (!hasPieceBellow(peice, grid) && !isAtBottom(peice, grid)) {
+        peice.y += 1;
+        rowsDropped++;
+    }
+    return rowsDropped;
+}
+export { isAtBottom, isAtTop, isAtRightBarrier, isAtLeftBarrier, hasPieceBellow, hasPieceOnRight, hasPieceOnLeft, dropBlocks, dropPeice, };

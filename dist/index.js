@@ -1,7 +1,7 @@
 import { clrscrn, drawBlock, drawGridLines } from "./drawUtils.js";
 import { updateGrid, createGrid, createGridBoard, clearGrid, } from "./grid.js";
 import { LeftwardZigZag, Square, Straight, Tri, RightwardZigZag, LeftwardL, RightwardL, } from "./peices.js";
-import { isAtBottom, isAtRightBarrier, isAtLeftBarrier, hasPieceBellow, hasPieceOnRight, hasPieceOnLeft, isAtTop, dropBlocks, } from "./physics.js";
+import { isAtBottom, isAtRightBarrier, isAtLeftBarrier, hasPieceBellow, hasPieceOnRight, hasPieceOnLeft, isAtTop, dropBlocks, dropPeice, } from "./physics.js";
 const Game = {};
 const controlButton = document.querySelector("#ctlbtn");
 function getRandomBlock() {
@@ -26,13 +26,14 @@ function initGame(Game, canvas) {
     createGridBoard(Game.gameBoard, Game.grid);
     Game.isPlaying = false;
     Game.timing = {
-        interval: 1000,
+        interval: 800,
         lastTime: 0,
     };
     Game.scoreBoard = document.querySelector("#scoreBoard");
     Game.score = 0;
     Game.scoreMultiplier = 1;
     Game.linesCleared = 0;
+    Game.nextLineThreshold = 10;
 }
 function handleInput(Game, ev) {
     const { currPeice, grid } = Game;
@@ -75,6 +76,10 @@ function handleInput(Game, ev) {
                 currPeice.y += 1;
             }
             updateGrid(grid, currPeice);
+            break;
+        case " ":
+            Game.score += dropPeice(Game.currPeice, Game.grid);
+            updateScoreBoard(Game);
             break;
     }
 }
@@ -121,7 +126,16 @@ function playGame(Game) {
             }
             if (filledRows.length > 0) {
                 dropBlocks(Game.grid, filledRows.length);
+                Game.linesCleared += filledRows.length;
+                Game.score += filledRows.length * 100 * Game.scoreMultiplier;
+                updateScoreBoard(Game);
             }
+        }
+        if (Game.linesCleared >= Game.nextLineThreshold) {
+            Game.scoreMultiplier += 1;
+            Game.nextLineThreshold += 10;
+            Game.timing.interval =
+                (Math.max(48 - 5 * Game.scoreMultiplier, 1) / 60) * 1000;
         }
         if (isAtTop(Game.currPeice, Game.grid) &&
             hasPieceBellow(Game.currPeice, Game.grid)) {
@@ -135,6 +149,8 @@ function stopGame(Game) {
     Game.score = 0;
     Game.scoreMultiplier = 1;
     Game.linesCleared = 0;
+    Game.nextLineThreshold = 10;
+    Game.timing.interval = 800;
     updateScoreBoard(Game);
     cancelAnimationFrame(Game.frameRef);
     Game.isPlaying = false;
