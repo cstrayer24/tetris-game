@@ -78,7 +78,9 @@ function handleInput(Game, ev) {
             updateGrid(grid, currPeice);
             break;
         case " ":
-            Game.score += dropPeice(Game.currPeice, Game.grid);
+            const rowsDropped = dropPeice(Game.currPeice, Game.grid);
+            console.log(rowsDropped);
+            Game.score += rowsDropped;
             updateScoreBoard(Game);
             break;
     }
@@ -187,9 +189,12 @@ controlButton.addEventListener("click", (ev) => {
     if (Game.isPlaying) {
         playGame(Game);
         controlButton.innerText = "stop";
+        // do this so you can do a hard drop without it pressing the control button again
+        controlButton.blur();
     }
     else {
         stopGame(Game);
         controlButton.innerText = "start";
+        controlButton.blur();
     }
 });

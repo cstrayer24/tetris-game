@@ -5,9 +5,14 @@ const isAtLeftBarrier = (peice, grid) => !!peice.blks.find((v) => v.x <= 0);
 const hasPieceBellow = (peice, grid) => {
     let isTouching = false;
     peice.blks.forEach((v) => {
-        if (typeof grid[v.y + 1][v.x] !== "undefined" &&
-            !peice.blks.includes(grid[v.y + 1][v.x])) {
-            isTouching = true;
+        try {
+            if (typeof grid[v.y + 1][v.x] !== "undefined" &&
+                !peice.blks.includes(grid[v.y + 1][v.x])) {
+                isTouching = true;
+            }
+        }
+        catch (e) {
+            alert("bug in hasPieceBellow");
         }
     });
     return isTouching;

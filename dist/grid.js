@@ -12,11 +12,17 @@ function updateGrid(grid, peice, isInternalGrid) {
     const xKey = isInternalGrid ? "ix" : "x";
     const yKey = isInternalGrid ? "iy" : "y";
     blks.forEach((v) => {
+        if (v[yKey] > grid.length - 1 || grid[yKey] < 0) {
+            return;
+        }
+        if (v[xKey] > grid[v[yKey]].length - 1) {
+            return;
+        }
         try {
             grid[v[yKey]][v[xKey]] = v;
         }
-        catch (error) {
-            debugger;
+        catch (e) {
+            alert("error in updateGrid");
         }
     });
     for (let i = 0; i < grid.length; i++) {
