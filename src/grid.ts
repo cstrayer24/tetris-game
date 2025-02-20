@@ -105,6 +105,7 @@ function createGridBoard(gameBoard: HTMLCanvasElement, grid: grid) {
   gameBoard.width = grid[0].length * BLOCKW;
   gameBoard.height = grid.length * BLOCKH;
 }
+
 export type { grid };
 export {
   createGrid,

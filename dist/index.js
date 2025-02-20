@@ -62,24 +62,19 @@ function handleInput(Game, ev) {
             break;
         case "ArrowUp":
             currPeice.rotate();
-            if (isAtLeftBarrier(currPeice, grid) || hasPieceOnLeft(currPeice, grid)) {
+            while (currPeice.blks.find((blk) => blk.y < 0)) {
+                currPeice.y += 1;
+            }
+            while (currPeice.blks.find((blk) => blk.x < 0)) {
                 currPeice.x += 1;
             }
-            if (isAtRightBarrier(currPeice, grid) ||
-                hasPieceOnRight(currPeice, grid)) {
+            while (currPeice.blks.find((blk) => blk.x >= Game.grid[0].length)) {
                 currPeice.x -= 1;
-            }
-            if (isAtBottom(currPeice, grid) || hasPieceBellow(currPeice, grid)) {
-                currPeice.y -= 1;
-            }
-            if (isAtTop(currPeice, grid)) {
-                currPeice.y += 1;
             }
             updateGrid(grid, currPeice);
             break;
         case " ":
             const rowsDropped = dropPeice(Game.currPeice, Game.grid);
-            console.log(rowsDropped);
             Game.score += rowsDropped;
             updateScoreBoard(Game);
             break;

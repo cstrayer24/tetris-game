@@ -22,32 +22,44 @@ class Block {
 class Tetriminoe {
     px;
     py;
-    blks;
     internalGrid;
+    rotationPoint;
+    blks;
     color;
     constructor(x, y, color) {
         this.px = x;
         this.py = y;
         this.color = color;
         this.internalGrid = createGrid(IGRIDW, IGRIDH);
+        this.rotationPoint = 0;
     }
     get x() {
         return this.px;
     }
     set x(nx) {
         this.px = nx;
+        this.blks.forEach((v, i) => {
+            v.x = this.px;
+        });
+        scaleInternalToGameboardGrid(this.internalGrid, this.blks[this.rotationPoint]);
     }
     get y() {
         return this.py;
     }
     set y(ny) {
         this.py = ny;
+        this.blks.forEach((v, i) => {
+            v.y = this.py;
+        });
+        scaleInternalToGameboardGrid(this.internalGrid, this.blks[this.rotationPoint]);
     }
     draw(ctx) {
-        this.blks.forEach((v) => drawBlock(v, ctx));
+        this.blks.forEach((blk) => drawBlock(blk, ctx));
     }
     rotate() {
-        return;
+        this.internalGrid = swapRowsAndCols(reverseRows(this.internalGrid));
+        setBlockPosToInternalGridPos(this.internalGrid);
+        scaleInternalToGameboardGrid(this.internalGrid, this.blks[this.rotationPoint]);
     }
 }
 class Straight extends Tetriminoe {
@@ -62,30 +74,13 @@ class Straight extends Tetriminoe {
         updateGrid(this.internalGrid, this, true);
         scaleInternalToGameboardGrid(this.internalGrid, this.blks[0]);
     }
-    get x() {
-        return this.px;
-    }
-    set x(nx) {
-        this.px = nx;
-        this.blks.forEach((v, i) => {
-            v.x = this.px;
-        });
-        scaleInternalToGameboardGrid(this.internalGrid, this.blks[0]);
-    }
-    get y() {
-        return this.py;
-    }
-    set y(ny) {
-        this.py = ny;
-        this.blks.forEach((v, i) => {
-            v.y = this.py;
-        });
-        scaleInternalToGameboardGrid(this.internalGrid, this.blks[0]);
-    }
     rotate() {
         this.internalGrid = swapRowsAndCols(reverseRows(this.internalGrid));
         setBlockPosToInternalGridPos(this.internalGrid);
         scaleInternalToGameboardGrid(this.internalGrid, this.blks[0]);
+        while (!!this.blks.find((blk) => blk.y < 0)) {
+            this.y++;
+        }
     }
 }
 class Square extends Tetriminoe {
@@ -100,6 +95,7 @@ class Square extends Tetriminoe {
         updateGrid(this.internalGrid, this, true);
         scaleInternalToGameboardGrid(this.internalGrid, this.blks[0]);
     }
+    //both getters and setters need to be present here since the setters are overloaded
     get x() {
         return this.px;
     }
@@ -109,6 +105,7 @@ class Square extends Tetriminoe {
         this.blks[1].x = this.px + 1;
         this.blks[2].x = this.px;
         this.blks[3].x = this.px + 1;
+        console.log(this.blks);
     }
     get y() {
         return this.py;
@@ -118,6 +115,9 @@ class Square extends Tetriminoe {
         this.blks.forEach((v, i) => {
             i <= 1 ? (v.y = this.py) : (v.y = this.py + 1);
         });
+    }
+    rotate() {
+        return;
     }
 }
 class Tri extends Tetriminoe {
@@ -129,32 +129,8 @@ class Tri extends Tetriminoe {
             new Block(x, y, Math.floor(this.internalGrid[0].length / 2) - 1, Math.floor(this.internalGrid.length / 2) + 1, BLOCKW, BLOCKH, this.color),
             new Block(x, y, Math.floor(this.internalGrid[0].length / 2), Math.floor(this.internalGrid.length / 2), BLOCKW, BLOCKH, this.color),
         ];
+        this.rotationPoint = 3;
         updateGrid(this.internalGrid, this, true);
-        scaleInternalToGameboardGrid(this.internalGrid, this.blks[3]);
-    }
-    get x() {
-        return this.px;
-    }
-    set x(nx) {
-        this.px = nx;
-        this.blks.forEach((v, i) => {
-            v.x = this.px;
-        });
-        scaleInternalToGameboardGrid(this.internalGrid, this.blks[3]);
-    }
-    get y() {
-        return this.py;
-    }
-    set y(ny) {
-        this.py = ny;
-        this.blks.forEach((v, i) => {
-            v.y = this.py;
-        });
-        scaleInternalToGameboardGrid(this.internalGrid, this.blks[3]);
-    }
-    rotate() {
-        this.internalGrid = swapRowsAndCols(reverseRows(this.internalGrid));
-        setBlockPosToInternalGridPos(this.internalGrid);
         scaleInternalToGameboardGrid(this.internalGrid, this.blks[3]);
     }
 }
@@ -167,32 +143,8 @@ class LeftwardZigZag extends Tetriminoe {
             new Block(this.px, this.py, Math.floor(this.internalGrid[0].length / 2), Math.floor(this.internalGrid.length / 2), BLOCKW, BLOCKH, this.color),
             new Block(this.px, this.py, Math.floor(this.internalGrid[0].length / 2) + 1, Math.floor(this.internalGrid.length / 2), BLOCKW, BLOCKH, this.color),
         ];
+        this.rotationPoint = 2;
         updateGrid(this.internalGrid, this, true);
-        scaleInternalToGameboardGrid(this.internalGrid, this.blks[2]);
-    }
-    get x() {
-        return this.px;
-    }
-    set x(nx) {
-        this.px = nx;
-        this.blks.forEach((v, i) => {
-            v.x = this.px;
-        });
-        scaleInternalToGameboardGrid(this.internalGrid, this.blks[2]);
-    }
-    get y() {
-        return this.py;
-    }
-    set y(ny) {
-        this.py = ny;
-        this.blks.forEach((v, i) => {
-            v.y = this.py;
-        });
-        scaleInternalToGameboardGrid(this.internalGrid, this.blks[2]);
-    }
-    rotate() {
-        this.internalGrid = swapRowsAndCols(reverseRows(this.internalGrid));
-        setBlockPosToInternalGridPos(this.internalGrid);
         scaleInternalToGameboardGrid(this.internalGrid, this.blks[2]);
     }
 }
@@ -205,32 +157,8 @@ class RightwardZigZag extends Tetriminoe {
             new Block(this.px, this.py, Math.floor(this.internalGrid[0].length / 2), Math.floor(this.internalGrid.length / 2), BLOCKW, BLOCKH, this.color),
             new Block(this.px, this.py, Math.floor(this.internalGrid[0].length / 2) - 1, Math.floor(this.internalGrid.length / 2), BLOCKW, BLOCKH, this.color),
         ];
+        this.rotationPoint = 2;
         updateGrid(this.internalGrid, this, true);
-        scaleInternalToGameboardGrid(this.internalGrid, this.blks[2]);
-    }
-    get x() {
-        return this.px;
-    }
-    set x(nx) {
-        this.px = nx;
-        this.blks.forEach((v, i) => {
-            v.x = this.px;
-        });
-        scaleInternalToGameboardGrid(this.internalGrid, this.blks[2]);
-    }
-    get y() {
-        return this.py;
-    }
-    set y(ny) {
-        this.py = ny;
-        this.blks.forEach((v, i) => {
-            v.y = this.py;
-        });
-        scaleInternalToGameboardGrid(this.internalGrid, this.blks[2]);
-    }
-    rotate() {
-        this.internalGrid = swapRowsAndCols(reverseRows(this.internalGrid));
-        setBlockPosToInternalGridPos(this.internalGrid);
         scaleInternalToGameboardGrid(this.internalGrid, this.blks[2]);
     }
 }
@@ -246,31 +174,6 @@ class LeftwardL extends Tetriminoe {
         updateGrid(this.internalGrid, this, true);
         scaleInternalToGameboardGrid(this.internalGrid, this.blks[0]);
     }
-    get x() {
-        return this.px;
-    }
-    set x(nx) {
-        this.px = nx;
-        this.blks.forEach((v, i) => {
-            v.x = this.px;
-        });
-        scaleInternalToGameboardGrid(this.internalGrid, this.blks[0]);
-    }
-    get y() {
-        return this.py;
-    }
-    set y(ny) {
-        this.py = ny;
-        this.blks.forEach((v, i) => {
-            v.y = this.py;
-        });
-        scaleInternalToGameboardGrid(this.internalGrid, this.blks[0]);
-    }
-    rotate() {
-        this.internalGrid = swapRowsAndCols(reverseRows(this.internalGrid));
-        setBlockPosToInternalGridPos(this.internalGrid);
-        scaleInternalToGameboardGrid(this.internalGrid, this.blks[0]);
-    }
 }
 class RightwardL extends Tetriminoe {
     constructor(x, y) {
@@ -282,31 +185,6 @@ class RightwardL extends Tetriminoe {
             new Block(this.px + 1, this.py + 2, Math.floor(this.internalGrid[0].length / 2) + 1, 2, BLOCKW, BLOCKH, this.color),
         ];
         updateGrid(this.internalGrid, this, true);
-        scaleInternalToGameboardGrid(this.internalGrid, this.blks[0]);
-    }
-    get x() {
-        return this.px;
-    }
-    set x(nx) {
-        this.px = nx;
-        this.blks.forEach((v, i) => {
-            v.x = this.px;
-        });
-        scaleInternalToGameboardGrid(this.internalGrid, this.blks[0]);
-    }
-    get y() {
-        return this.py;
-    }
-    set y(ny) {
-        this.py = ny;
-        this.blks.forEach((v, i) => {
-            v.y = this.py;
-        });
-        scaleInternalToGameboardGrid(this.internalGrid, this.blks[0]);
-    }
-    rotate() {
-        this.internalGrid = swapRowsAndCols(reverseRows(this.internalGrid));
-        setBlockPosToInternalGridPos(this.internalGrid);
         scaleInternalToGameboardGrid(this.internalGrid, this.blks[0]);
     }
 }

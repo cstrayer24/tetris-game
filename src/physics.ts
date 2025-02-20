@@ -13,15 +13,12 @@ const isAtLeftBarrier = (peice: Tetriminoe, grid: grid) =>
 const hasPieceBellow = (peice: Tetriminoe, grid: grid) => {
   let isTouching = false;
   peice.blks.forEach((v) => {
-    try {
-      if (
-        typeof grid[v.y + 1][v.x] !== "undefined" &&
-        !peice.blks.includes(grid[v.y + 1][v.x])
-      ) {
-        isTouching = true;
-      }
-    } catch (e) {
-      alert("bug in hasPieceBellow");
+    if (
+      v.y === grid.length - 1 ||
+      (grid[v.y + 1][v.x] !== undefined &&
+        !peice.blks.includes(grid[v.y + 1][v.x]))
+    ) {
+      isTouching = true;
     }
   });
   return isTouching;
@@ -103,12 +100,11 @@ function dropBlocks(grid: grid, numClearedRows: number) {
 }
 
 function dropPeice(peice: Tetriminoe, grid: grid) {
-  let rowsDropped = 0;
+  const initalY = peice.y;
   while (!hasPieceBellow(peice, grid) && !isAtBottom(peice, grid)) {
     peice.y += 1;
-    rowsDropped++;
   }
-  return rowsDropped;
+  return Math.max(peice.y - initalY, 1);
 }
 export {
   isAtBottom,
