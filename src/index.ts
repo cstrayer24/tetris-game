@@ -132,6 +132,12 @@ function handleInput(Game: game, ev: KeyboardEvent) {
       Game.score += rowsDropped;
       updateScoreBoard(Game);
       break;
+    case "c":
+      Game.currPeice.blks.forEach((blk) => {
+        grid[blk.y][blk.x] = undefined;
+      });
+      Game.currPeice = getRandomBlock();
+      break;
   }
 }
 

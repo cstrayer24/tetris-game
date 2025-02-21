@@ -50,7 +50,7 @@ const hasPieceOnLeft = (piece: Tetriminoe, grid: grid) => {
   return isTouching;
 };
 
-function dropBlocks(grid: grid, numClearedRows: number) {
+function dropBlocksFromBottomUp(grid: grid, numClearedRows: number) {
   if (grid.every((row) => row.every((blk) => blk === undefined))) {
     return;
   }
@@ -98,7 +98,73 @@ function dropBlocks(grid: grid, numClearedRows: number) {
     }
   }
 }
+function dropBlocks(grid: grid, numClearedRows: number) {
+  if (grid.every((row) => row.every((blk) => blk === undefined))) {
+    return;
+  }
+  let topMostNonEmptyRow = grid.findIndex(
+    (row) => !row.every((blk) => blk === undefined)
+  );
+  let bottomMostEmptyRow = grid.findLastIndex((row) =>
+    row.every((blk) => blk === undefined)
+  );
+  let state: 1 | 2 | 3 = 1;
+  let nonEmptyRow = topMostNonEmptyRow;
+  const nonEmptyRows = [];
+  let emptyRow = -1;
+  let pullDownAmnt = 0;
+  while (topMostNonEmptyRow < bottomMostEmptyRow) {
+    switch (state) {
+      case 1:
+        if (nonEmptyRow >= grid.length) {
+          state = 3;
+          continue;
+        }
+        if (grid[nonEmptyRow].every((blk) => blk === undefined)) {
+          emptyRow = nonEmptyRow;
+          state = 2;
+          continue;
+        }
+        nonEmptyRows.push(nonEmptyRow);
+        nonEmptyRow++;
+        break;
+      case 2:
+        if (emptyRow >= grid.length) {
+          state = 3;
+          continue;
+        }
+        if (!grid[emptyRow].every((blk) => blk === undefined)) {
+          state = 3;
+          continue;
+        }
+        pullDownAmnt++;
+        emptyRow++;
+        break;
+      case 3:
+        while (nonEmptyRows.length != 0) {
+          const currRow = nonEmptyRows.pop();
+          for (let i = 0; i < grid[currRow].length; i++) {
+            if (grid[currRow][i] === undefined) {
+              continue;
+            }
+            const currBlock = grid[currRow][i];
+            currBlock.y += pullDownAmnt;
+            grid[currBlock.y][currBlock.x] = currBlock;
+          }
+        }
+        topMostNonEmptyRow = grid.findIndex(
+          (row) => !row.every((blk) => blk === undefined)
+        );
+        nonEmptyRow = topMostNonEmptyRow;
+        bottomMostEmptyRow = grid.findLastIndex((row) =>
+          row.every((blk) => blk === undefined)
+        );
+        state = 1;
 
+        break;
+    }
+  }
+}
 function dropPeice(peice: Tetriminoe, grid: grid) {
   const initalY = peice.y;
   while (!hasPieceBellow(peice, grid) && !isAtBottom(peice, grid)) {

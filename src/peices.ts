@@ -195,7 +195,7 @@ class Square extends Tetriminoe {
     updateGrid(this.internalGrid, this, true);
     scaleInternalToGameboardGrid(this.internalGrid, this.blks[0]);
   }
-  //both getters and setters need to be present here since the setters are overloaded
+  //the getters also need to be overloaded since the setters are
   get x() {
     return this.px;
   }
