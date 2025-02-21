@@ -50,55 +50,7 @@ const hasPieceOnLeft = (piece: Tetriminoe, grid: grid) => {
   return isTouching;
 };
 
-function dropBlocksFromBottomUp(grid: grid, numClearedRows: number) {
-  if (grid.every((row) => row.every((blk) => blk === undefined))) {
-    return;
-  }
-  let bottomMostEmptyRow = grid.findLastIndex((row) =>
-    row.every((blk) => blk === undefined)
-  );
-  let topMostNonEmptyRow = grid.findIndex(
-    (row) => !row.every((blk) => blk === undefined)
-  );
-  let nonEmptyRow = bottomMostEmptyRow - numClearedRows;
-  const nonEmptyRows = [];
-  let iterCount = 0;
-  while (topMostNonEmptyRow < bottomMostEmptyRow) {
-    if (grid[nonEmptyRow].every((blk) => blk === undefined)) {
-      nonEmptyRows.unshift(nonEmptyRow);
-
-      const pullDownAmnt = numClearedRows;
-
-      while (nonEmptyRows.length != 0) {
-        const currRow = nonEmptyRows.pop();
-        for (let j = 0; j < grid[currRow].length; j++) {
-          if (grid[currRow][j] === undefined) {
-            continue;
-          }
-
-          const currBlock = grid[currRow][j];
-          currBlock.y += pullDownAmnt;
-          grid[currBlock.y][currBlock.x] = currBlock;
-        }
-      }
-      bottomMostEmptyRow = grid.findLastIndex((row) =>
-        row.every((blk) => blk === undefined)
-      );
-      topMostNonEmptyRow = grid.findIndex(
-        (row) => !row.every((blk) => blk === undefined)
-      );
-      nonEmptyRow = bottomMostEmptyRow - numClearedRows;
-    } else {
-      nonEmptyRows.unshift(nonEmptyRow);
-      nonEmptyRow--;
-    }
-    iterCount++;
-    if (iterCount >= 100) {
-      break;
-    }
-  }
-}
-function dropBlocks(grid: grid, numClearedRows: number) {
+function dropBlocks(grid: grid) {
   if (grid.every((row) => row.every((blk) => blk === undefined))) {
     return;
   }

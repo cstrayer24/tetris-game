@@ -78,9 +78,6 @@ class Straight extends Tetriminoe {
         this.internalGrid = swapRowsAndCols(reverseRows(this.internalGrid));
         setBlockPosToInternalGridPos(this.internalGrid);
         scaleInternalToGameboardGrid(this.internalGrid, this.blks[0]);
-        while (!!this.blks.find((blk) => blk.y < 0)) {
-            this.y++;
-        }
     }
 }
 class Square extends Tetriminoe {
@@ -105,7 +102,6 @@ class Square extends Tetriminoe {
         this.blks[1].x = this.px + 1;
         this.blks[2].x = this.px;
         this.blks[3].x = this.px + 1;
-        console.log(this.blks);
     }
     get y() {
         return this.py;

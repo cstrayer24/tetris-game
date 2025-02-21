@@ -92,7 +92,7 @@ function handleInput(Game: game, ev: KeyboardEvent) {
         !isAtRightBarrier(currPeice, grid) &&
         !hasPieceOnRight(currPeice, grid)
       ) {
-        currPeice.x += 1;
+        currPeice.x++;
       }
       updateGrid(grid, currPeice);
       break;
@@ -101,14 +101,14 @@ function handleInput(Game: game, ev: KeyboardEvent) {
         !isAtLeftBarrier(currPeice, grid) &&
         !hasPieceOnLeft(currPeice, grid)
       ) {
-        currPeice.x -= 1;
+        currPeice.x--;
       }
       updateGrid(grid, currPeice);
       break;
     case "ArrowDown":
       if (!isAtBottom(currPeice, grid) && !hasPieceBellow(currPeice, grid)) {
-        currPeice.y += 1;
-        Game.score += 1;
+        currPeice.y++;
+        Game.score++;
         updateScoreBoard(Game);
       }
       updateGrid(grid, currPeice);
@@ -171,7 +171,15 @@ function playGame(Game: game) {
     }
     Game.frameRef = requestAnimationFrame(animationLoop);
     if (t - Game.timing.lastTime >= Game.timing.interval) {
-      Game.currPeice.y += 1;
+      if (
+        !(
+          isAtBottom(Game.currPeice, Game.grid) ||
+          hasPieceBellow(Game.currPeice, Game.grid)
+        )
+      ) {
+        Game.currPeice.y++;
+      } 
+    
       Game.timing.lastTime = t;
     }
     clrscrn(Game.ctx);
@@ -186,17 +194,17 @@ function playGame(Game: game) {
       const filledRows = Game.grid.filter((v) => !v.includes(undefined));
       for (let i = 0; i < filledRows.length; i++) {
         const blk = filledRows[i][0];
-        Game.grid[blk.y] = Game.grid[blk.y].map((v, i) => undefined);
+        Game.grid[blk.y] = Game.grid[blk.y].map(() => undefined);
       }
       if (filledRows.length > 0) {
-        dropBlocks(Game.grid, filledRows.length);
+        dropBlocks(Game.grid);
         Game.linesCleared += filledRows.length;
         Game.score += filledRows.length * 100 * Game.scoreMultiplier;
         updateScoreBoard(Game);
       }
     }
     if (Game.linesCleared >= Game.nextLineThreshold) {
-      Game.scoreMultiplier += 1;
+      Game.scoreMultiplier++;
       Game.nextLineThreshold += 10;
       Game.timing.interval =
         (Math.max(48 - 5 * Game.scoreMultiplier, 1) / 60) * 1000;
@@ -244,6 +252,7 @@ function doGameOver(Game: game) {
   finalGameScore.innerText = `score:${Game.score}`;
   gameOverContainer.style.display = "grid";
   renderGame(Game);
+  releaseEvents(Game);
   resetBtn.onclick = (ev) => {
     resetGame(Game);
     ctlButton.disabled = false;
