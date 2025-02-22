@@ -36,6 +36,7 @@ type game = {
   currPeice: Tetriminoe;
   grid: grid;
   frameRef: number;
+  timeoutRef: number;
   gameBoard: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   timing: timing_t;
@@ -128,9 +129,11 @@ function handleInput(Game: game, ev: KeyboardEvent) {
       updateGrid(grid, currPeice);
       break;
     case " ":
-      const rowsDropped = dropPeice(Game.currPeice, Game.grid);
+      const rowsDropped = dropPeice(currPeice, grid);
       Game.score += rowsDropped;
       updateScoreBoard(Game);
+      updateGrid(grid, currPeice);
+      handleDrop(Game);
       break;
     case "c":
       Game.currPeice.blks.forEach((blk) => {
@@ -163,6 +166,7 @@ function renderGame(Game: game) {
 function playGame(Game: game) {
   Game.isPlaying = true;
   Game.currPeice = getRandomBlock();
+  Game.timeoutRef = 0;
 
   bindEvents(Game);
   const animationLoop = (t) => {
@@ -178,8 +182,8 @@ function playGame(Game: game) {
         )
       ) {
         Game.currPeice.y++;
-      } 
-    
+      }
+
       Game.timing.lastTime = t;
     }
     clrscrn(Game.ctx);
@@ -190,17 +194,11 @@ function playGame(Game: game) {
       isAtBottom(Game.currPeice, Game.grid) ||
       hasPieceBellow(Game.currPeice, Game.grid)
     ) {
-      Game.currPeice = getRandomBlock();
-      const filledRows = Game.grid.filter((v) => !v.includes(undefined));
-      for (let i = 0; i < filledRows.length; i++) {
-        const blk = filledRows[i][0];
-        Game.grid[blk.y] = Game.grid[blk.y].map(() => undefined);
-      }
-      if (filledRows.length > 0) {
-        dropBlocks(Game.grid);
-        Game.linesCleared += filledRows.length;
-        Game.score += filledRows.length * 100 * Game.scoreMultiplier;
-        updateScoreBoard(Game);
+      if (Game.timeoutRef === 0) {
+        Game.timeoutRef = setTimeout(() => {
+          handleDrop(Game);
+          Game.timeoutRef = 0;
+        }, 1000);
       }
     }
     if (Game.linesCleared >= Game.nextLineThreshold) {
@@ -239,7 +237,20 @@ function resetGame(Game: game) {
   stopGame(Game);
   playGame(Game);
 }
-
+function handleDrop(Game: game) {
+  Game.currPeice = getRandomBlock();
+  const filledRows = Game.grid.filter((v) => !v.includes(undefined));
+  for (let i = 0; i < filledRows.length; i++) {
+    const blk = filledRows[i][0];
+    Game.grid[blk.y] = Game.grid[blk.y].map(() => undefined);
+  }
+  if (filledRows.length > 0) {
+    dropBlocks(Game.grid);
+    Game.linesCleared += filledRows.length;
+    Game.score += filledRows.length * 100 * Game.scoreMultiplier;
+    updateScoreBoard(Game);
+  }
+}
 function doGameOver(Game: game) {
   const gameOverContainer: HTMLDivElement =
     document.querySelector("#gameOverUi");

@@ -74,9 +74,11 @@ function handleInput(Game, ev) {
             updateGrid(grid, currPeice);
             break;
         case " ":
-            const rowsDropped = dropPeice(Game.currPeice, Game.grid);
+            const rowsDropped = dropPeice(currPeice, grid);
             Game.score += rowsDropped;
             updateScoreBoard(Game);
+            updateGrid(grid, currPeice);
+            handleDrop(Game);
             break;
         case "c":
             Game.currPeice.blks.forEach((blk) => {
@@ -106,6 +108,7 @@ function renderGame(Game) {
 function playGame(Game) {
     Game.isPlaying = true;
     Game.currPeice = getRandomBlock();
+    Game.timeoutRef = 0;
     bindEvents(Game);
     const animationLoop = (t) => {
         if (!Game.isPlaying) {
@@ -124,17 +127,11 @@ function playGame(Game) {
         renderGame(Game);
         if (isAtBottom(Game.currPeice, Game.grid) ||
             hasPieceBellow(Game.currPeice, Game.grid)) {
-            Game.currPeice = getRandomBlock();
-            const filledRows = Game.grid.filter((v) => !v.includes(undefined));
-            for (let i = 0; i < filledRows.length; i++) {
-                const blk = filledRows[i][0];
-                Game.grid[blk.y] = Game.grid[blk.y].map(() => undefined);
-            }
-            if (filledRows.length > 0) {
-                dropBlocks(Game.grid);
-                Game.linesCleared += filledRows.length;
-                Game.score += filledRows.length * 100 * Game.scoreMultiplier;
-                updateScoreBoard(Game);
+            if (Game.timeoutRef === 0) {
+                Game.timeoutRef = setTimeout(() => {
+                    handleDrop(Game);
+                    Game.timeoutRef = 0;
+                }, 1000);
             }
         }
         if (Game.linesCleared >= Game.nextLineThreshold) {
@@ -168,6 +165,20 @@ function stopGame(Game) {
 function resetGame(Game) {
     stopGame(Game);
     playGame(Game);
+}
+function handleDrop(Game) {
+    Game.currPeice = getRandomBlock();
+    const filledRows = Game.grid.filter((v) => !v.includes(undefined));
+    for (let i = 0; i < filledRows.length; i++) {
+        const blk = filledRows[i][0];
+        Game.grid[blk.y] = Game.grid[blk.y].map(() => undefined);
+    }
+    if (filledRows.length > 0) {
+        dropBlocks(Game.grid);
+        Game.linesCleared += filledRows.length;
+        Game.score += filledRows.length * 100 * Game.scoreMultiplier;
+        updateScoreBoard(Game);
+    }
 }
 function doGameOver(Game) {
     const gameOverContainer = document.querySelector("#gameOverUi");
