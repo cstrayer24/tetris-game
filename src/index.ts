@@ -56,7 +56,7 @@ function getRandomBlock(): Tetriminoe {
   const peices = [
     LeftwardZigZag,
     RightwardZigZag,
-    // Square,
+    Square,
     Straight,
     Tri,
     RightwardL,

@@ -1,6 +1,6 @@
 import { clrscrn, drawBlock, drawGridLines } from "./drawUtils.js";
 import { updateGrid, createGrid, createGridBoard, clearGrid, } from "./grid.js";
-import { LeftwardZigZag, Straight, Tri, RightwardZigZag, LeftwardL, RightwardL, } from "./peices.js";
+import { LeftwardZigZag, Square, Straight, Tri, RightwardZigZag, LeftwardL, RightwardL, } from "./peices.js";
 import { isAtBottom, isAtRightBarrier, isAtLeftBarrier, hasPieceBellow, hasPieceOnRight, hasPieceOnLeft, isAtTop, dropBlocks, dropPeice, } from "./physics.js";
 const Game = {};
 const controlButton = document.querySelector("#ctlbtn");
@@ -8,7 +8,7 @@ function getRandomBlock() {
     const peices = [
         LeftwardZigZag,
         RightwardZigZag,
-        // Square,
+        Square,
         Straight,
         Tri,
         RightwardL,
