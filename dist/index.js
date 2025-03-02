@@ -1,6 +1,6 @@
 import { clrscrn, drawBlock, drawGridLines } from "./drawUtils.js";
 import { updateGrid, createGrid, createGridBoard, clearGrid, } from "./grid.js";
-import { LeftwardZigZag, Square, Straight, Tri, RightwardZigZag, LeftwardL, RightwardL, } from "./peices.js";
+import { LeftwardZigZag, Straight, Tri, RightwardZigZag, LeftwardL, RightwardL, } from "./peices.js";
 import { isAtBottom, isAtRightBarrier, isAtLeftBarrier, hasPieceBellow, hasPieceOnRight, hasPieceOnLeft, isAtTop, dropBlocks, dropPeice, } from "./physics.js";
 const Game = {};
 const controlButton = document.querySelector("#ctlbtn");
@@ -8,7 +8,7 @@ function getRandomBlock() {
     const peices = [
         LeftwardZigZag,
         RightwardZigZag,
-        Square,
+        // Square,
         Straight,
         Tri,
         RightwardL,
@@ -61,7 +61,8 @@ function handleInput(Game, ev) {
             updateGrid(grid, currPeice);
             break;
         case "ArrowUp":
-            currPeice.rotate();
+            currPeice.rotate(grid);
+            //wall kicks
             while (currPeice.blks.find((blk) => blk.y < 0)) {
                 currPeice.y += 1;
             }
@@ -167,6 +168,10 @@ function resetGame(Game) {
     playGame(Game);
 }
 function handleDrop(Game) {
+    if (!(hasPieceBellow(Game.currPeice, Game.grid) ||
+        isAtBottom(Game.currPeice, Game.grid))) {
+        return;
+    }
     Game.currPeice = getRandomBlock();
     const filledRows = Game.grid.filter((v) => !v.includes(undefined));
     for (let i = 0; i < filledRows.length; i++) {

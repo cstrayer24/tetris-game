@@ -18,12 +18,7 @@ function updateGrid(grid, peice, isInternalGrid) {
         if (v[xKey] > grid[v[yKey]].length - 1) {
             return;
         }
-        try {
-            grid[v[yKey]][v[xKey]] = v;
-        }
-        catch (e) {
-            alert("error in updateGrid");
-        }
+        grid[v[yKey]][v[xKey]] = v;
     });
     for (let i = 0; i < grid.length; i++) {
         for (let j = 0; j < grid[i].length; j++) {

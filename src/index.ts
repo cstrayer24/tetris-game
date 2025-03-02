@@ -56,7 +56,7 @@ function getRandomBlock(): Tetriminoe {
   const peices = [
     LeftwardZigZag,
     RightwardZigZag,
-    Square,
+    // Square,
     Straight,
     Tri,
     RightwardL,
@@ -116,7 +116,8 @@ function handleInput(Game: game, ev: KeyboardEvent) {
 
       break;
     case "ArrowUp":
-      currPeice.rotate();
+      currPeice.rotate(grid);
+      //wall kicks
       while (currPeice.blks.find((blk) => blk.y < 0)) {
         currPeice.y += 1;
       }
@@ -238,6 +239,14 @@ function resetGame(Game: game) {
   playGame(Game);
 }
 function handleDrop(Game: game) {
+  if (
+    !(
+      hasPieceBellow(Game.currPeice, Game.grid) ||
+      isAtBottom(Game.currPeice, Game.grid)
+    )
+  ) {
+    return;
+  }
   Game.currPeice = getRandomBlock();
   const filledRows = Game.grid.filter((v) => !v.includes(undefined));
   for (let i = 0; i < filledRows.length; i++) {

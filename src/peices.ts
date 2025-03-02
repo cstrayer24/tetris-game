@@ -86,13 +86,39 @@ class Tetriminoe {
     this.blks.forEach((blk) => drawBlock(blk, ctx));
   }
 
-  rotate() {
-    this.internalGrid = swapRowsAndCols(reverseRows(this.internalGrid));
-    setBlockPosToInternalGridPos(this.internalGrid);
-    scaleInternalToGameboardGrid(
-      this.internalGrid,
-      this.blks[this.rotationPoint]
-    );
+  rotate(outerGrid: grid) {
+    const blksClone = structuredClone(this.blks);
+    let IgridClone = createGrid(IGRIDW, IGRIDH);
+    blksClone.forEach((blk) => {
+      IgridClone[blk.iy][blk.ix] = blk;
+    });
+
+    IgridClone = swapRowsAndCols(reverseRows(IgridClone));
+    setBlockPosToInternalGridPos(IgridClone);
+    scaleInternalToGameboardGrid(IgridClone, blksClone[this.rotationPoint]);
+
+    for (const blk of blksClone) {
+      if (
+        blk.x >= outerGrid[0].length ||
+        blk.x < 0 ||
+        blk.y >= outerGrid.length ||
+        blk.y < 0
+      ) {
+        continue;
+      }
+
+      if (
+        outerGrid[blk.y][blk.x] !== undefined &&
+        !this.blks.includes(outerGrid[blk.y][blk.x])
+      ) {
+        return;
+      }
+    }
+    this.blks.forEach((blk) => {
+      outerGrid[blk.y][blk.x] = undefined;
+    });
+    this.blks = blksClone;
+    this.internalGrid = IgridClone;
   }
 }
 
@@ -137,13 +163,8 @@ class Straight extends Tetriminoe {
         this.color
       ),
     ];
+    this.rotationPoint = 0;
     updateGrid(this.internalGrid, this, true);
-    scaleInternalToGameboardGrid(this.internalGrid, this.blks[0]);
-  }
-
-  rotate(): void {
-    this.internalGrid = swapRowsAndCols(reverseRows(this.internalGrid));
-    setBlockPosToInternalGridPos(this.internalGrid);
     scaleInternalToGameboardGrid(this.internalGrid, this.blks[0]);
   }
 }
