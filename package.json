@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build":"tsc",
-    "build-watch":"tsc --watch",
-    "start":"serve"
+    "build": "tsc",
+    "build-watch": "tsc --watch",
+    "dev": "serve ./webRoot"
   },
   "keywords": [],
   "author": "",

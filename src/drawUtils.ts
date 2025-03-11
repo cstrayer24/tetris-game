@@ -1,5 +1,6 @@
 import { BLOCKH, BLOCKW } from "./constants.js";
-import { Block } from "./peices.js";
+import { grid } from "./grid.js";
+import { Block } from "./pieces.js";
 
 function drawBlock(block: Block, ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = block.color;
@@ -7,7 +8,7 @@ function drawBlock(block: Block, ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = "#00000";
 }
 
-function drawGridLines(ctx: CanvasRenderingContext2D, grid: Block[][]) {
+function drawGridLines(ctx: CanvasRenderingContext2D, grid: grid) {
   ctx.strokeStyle = "grey";
   ctx.beginPath();
   for (let i = 0; i < grid[0].length; i++) {

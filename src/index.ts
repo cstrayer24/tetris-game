@@ -15,9 +15,8 @@ import {
   LeftwardL,
   RightwardL,
   Tetriminoe,
-} from "./peices.js";
+} from "./pieces.js";
 import {
-  isAtBottom,
   isAtRightBarrier,
   isAtLeftBarrier,
   hasPieceBellow,
@@ -25,7 +24,7 @@ import {
   hasPieceOnLeft,
   isAtTop,
   dropBlocks,
-  dropPeice,
+  dropPiece,
 } from "./physics.js";
 type timing_t = {
   interval: number;
@@ -33,7 +32,7 @@ type timing_t = {
 };
 type game = {
   isPlaying: boolean;
-  currPeice: Tetriminoe;
+  currPiece: Tetriminoe;
   grid: grid;
   frameRef: number;
   timeoutRef: number;
@@ -51,8 +50,8 @@ type game = {
 const Game: game = {} as game;
 const controlButton: HTMLButtonElement = document.querySelector("#ctlbtn");
 
-function getRandomBlock(): Tetriminoe {
-  const peices = [
+function getRandomBlock(x, y): Tetriminoe {
+  const pieces = [
     LeftwardZigZag,
     RightwardZigZag,
     Square,
@@ -61,7 +60,7 @@ function getRandomBlock(): Tetriminoe {
     RightwardL,
     LeftwardL,
   ];
-  return new peices[Math.floor(Math.random() * peices.length)](5, 0);
+  return new pieces[Math.floor(Math.random() * pieces.length)](x, y);
 }
 
 function updateScoreBoard(Game: game) {
@@ -84,73 +83,91 @@ function initGame(Game: game, canvas: HTMLCanvasElement) {
   Game.nextLineThreshold = 10;
 }
 
-function handleInput(Game: game, ev: KeyboardEvent) {
-  const { currPeice, grid } = Game;
+function handleInput(
+  Game: game,
+  ev: KeyboardEvent,
+  inputMap: { [key: string]: boolean }
+) {
+  if (Object.keys(inputMap).includes(ev.key) && inputMap[ev.key]) {
+    return;
+  }
+  if (Object.keys(inputMap).includes(ev.key)) {
+    inputMap[ev.key] = true;
+  }
+  const { currPiece, grid } = Game;
   switch (ev.key) {
     case "ArrowRight":
       if (
-        !isAtRightBarrier(currPeice, grid) &&
-        !hasPieceOnRight(currPeice, grid)
+        !isAtRightBarrier(currPiece, grid) &&
+        !hasPieceOnRight(currPiece, grid)
       ) {
-        currPeice.x++;
+        currPiece.x++;
       }
-      updateGrid(grid, currPeice);
+      updateGrid(grid, currPiece);
       break;
     case "ArrowLeft":
       if (
-        !isAtLeftBarrier(currPeice, grid) &&
-        !hasPieceOnLeft(currPeice, grid)
+        !isAtLeftBarrier(currPiece, grid) &&
+        !hasPieceOnLeft(currPiece, grid)
       ) {
-        currPeice.x--;
+        currPiece.x--;
       }
-      updateGrid(grid, currPeice);
+      updateGrid(grid, currPiece);
       break;
     case "ArrowDown":
-      if (!isAtBottom(currPeice, grid) && !hasPieceBellow(currPeice, grid)) {
-        currPeice.y++;
+      if (!hasPieceBellow(currPiece, grid)) {
+        currPiece.y++;
         Game.score++;
         updateScoreBoard(Game);
       }
-      updateGrid(grid, currPeice);
+      updateGrid(grid, currPiece);
 
       break;
     case "ArrowUp":
-      currPeice.rotate(grid);
+      currPiece.rotate(grid);
       //wall kicks
-      while (currPeice.blks.find((blk) => blk.y < 0)) {
-        currPeice.y++;
+      while (currPiece.blks.find((blk) => blk.y < 0)) {
+        currPiece.y++;
       }
-      while (currPeice.blks.find((blk) => blk.x < 0)) {
-        currPeice.x++;
+      while (currPiece.blks.find((blk) => blk.x < 0)) {
+        currPiece.x++;
       }
-      while (currPeice.blks.find((blk) => blk.x >= Game.grid[0].length)) {
-        currPeice.x--;
+      while (currPiece.blks.find((blk) => blk.x >= Game.grid[0].length)) {
+        currPiece.x--;
       }
-      updateGrid(grid, currPeice);
+      updateGrid(grid, currPiece);
       break;
     case " ":
-      const rowsDropped = dropPeice(currPeice, grid);
+      const rowsDropped = dropPiece(currPiece, grid);
       Game.score += rowsDropped;
       updateScoreBoard(Game);
-      updateGrid(grid, currPeice);
+      updateGrid(grid, currPiece);
       handleDrop(Game);
-      break;
-    case "c":
-      Game.currPeice.blks.forEach((blk) => {
-        grid[blk.y][blk.x] = undefined;
-      });
-      Game.currPeice = getRandomBlock();
       break;
   }
 }
 
 function bindEvents(Game: game) {
-  window.onkeydown = (ev) => handleInput(Game, ev);
+  const inputMap = {
+    //user should be able to hold right left or down
+    // ArrowRight: false,
+    // ArrowLeft: false,
+    // ArrowDown: false,
+    ArrowUp: false,
+    " ": false,
+  };
+  window.onkeydown = (ev) => handleInput(Game, ev, inputMap);
+  window.onkeyup = (ev) => {
+    if (Object.keys(inputMap).includes(ev.key)) {
+      inputMap[ev.key] = false;
+    }
+  };
   Game.hasEvents = true;
 }
 
 function releaseEvents(Game: game) {
-  window.onkeydown = (ev) => undefined;
+  window.onkeydown = () => undefined;
+  window.onkeyup = () => undefined;
   Game.hasEvents = false;
 }
 
@@ -165,7 +182,7 @@ function renderGame(Game: game) {
 
 function playGame(Game: game) {
   Game.isPlaying = true;
-  Game.currPeice = getRandomBlock();
+  Game.currPiece = getRandomBlock(Game.grid[0].length / 2, 0);
   Game.timeoutRef = 0;
 
   bindEvents(Game);
@@ -175,22 +192,17 @@ function playGame(Game: game) {
     }
     Game.frameRef = requestAnimationFrame(animationLoop);
     if (t - Game.timing.lastTime >= Game.timing.interval) {
-      if (
-        !(
-          isAtBottom(Game.currPeice, Game.grid) ||
-          hasPieceBellow(Game.currPeice, Game.grid)
-        )
-      ) {
-        Game.currPeice.y++;
+      if (!hasPieceBellow(Game.currPiece, Game.grid)) {
+        Game.currPiece.y++;
       }
 
       Game.timing.lastTime = t;
     }
     clrscrn(Game.ctx);
-    updateGrid(Game.grid, Game.currPeice);
+    updateGrid(Game.grid, Game.currPiece);
     renderGame(Game);
 
-    if (hasPieceBellow(Game.currPeice, Game.grid)) {
+    if (hasPieceBellow(Game.currPiece, Game.grid)) {
       if (Game.timeoutRef === 0) {
         Game.timeoutRef = setTimeout(() => {
           handleDrop(Game);
@@ -205,10 +217,10 @@ function playGame(Game: game) {
         (Math.max(48 - 5 * Game.scoreMultiplier, 1) / 60) * 1000;
     }
     if (
-      isAtTop(Game.currPeice, Game.grid) &&
-      hasPieceBellow(Game.currPeice, Game.grid)
+      isAtTop(Game.currPiece, Game.grid) &&
+      hasPieceBellow(Game.currPiece, Game.grid)
     ) {
-      updateGrid(Game.grid, Game.currPeice);
+      updateGrid(Game.grid, Game.currPiece);
       return doGameOver(Game);
     }
   };
@@ -224,7 +236,7 @@ function stopGame(Game: game) {
   updateScoreBoard(Game);
   cancelAnimationFrame(Game.frameRef);
   Game.isPlaying = false;
-  Game.currPeice = null;
+  Game.currPiece = null;
   releaseEvents(Game);
   clearGrid(Game.grid);
   clrscrn(Game.ctx);
@@ -235,10 +247,10 @@ function resetGame(Game: game) {
   playGame(Game);
 }
 function handleDrop(Game: game) {
-  if (!hasPieceBellow(Game.currPeice, Game.grid)) {
+  if (!hasPieceBellow(Game.currPiece, Game.grid)) {
     return;
   }
-  Game.currPeice = getRandomBlock();
+  Game.currPiece = getRandomBlock(Game.grid[0].length / 2, 0);
   const filledRows = Game.grid.filter((v) => !v.includes(undefined));
   for (let i = 0; i < filledRows.length; i++) {
     const blk = filledRows[i][0];

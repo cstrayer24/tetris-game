@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "rootDir": "./src",
-    "outDir": "./dist",
+    "outDir": "webRoot/dist",
     "target": "ESNext",
     "lib": ["ESNext", "DOM"],
     "moduleResolution": "NodeNext"

@@ -1,22 +1,20 @@
 import { grid } from "./grid.js";
-import { Tetriminoe } from "./peices.js";
+import { Tetriminoe } from "./pieces.js";
 
 const isAtTop = (piece: Tetriminoe, grid: grid) =>
   !!piece.blks.find((v) => v.y <= 0);
-const isAtBottom = (peice: Tetriminoe, grid: grid) =>
-  !!peice.blks.find((v) => v.y >= grid.length - 1);
-const isAtRightBarrier = (peice: Tetriminoe, grid: grid) =>
-  !!peice.blks.find((v) => v.x >= grid[0].length - 1);
-const isAtLeftBarrier = (peice: Tetriminoe, grid: grid) =>
-  !!peice.blks.find((v) => v.x <= 0);
+const isAtRightBarrier = (piece: Tetriminoe, grid: grid) =>
+  !!piece.blks.find((v) => v.x >= grid[0].length - 1);
+const isAtLeftBarrier = (piece: Tetriminoe, grid: grid) =>
+  !!piece.blks.find((v) => v.x <= 0);
 
-const hasPieceBellow = (peice: Tetriminoe, grid: grid) => {
+const hasPieceBellow = (piece: Tetriminoe, grid: grid) => {
   let isTouching = false;
-  peice.blks.forEach((v) => {
+  piece.blks.forEach((v) => {
     if (
       v.y === grid.length - 1 ||
       (grid[v.y + 1][v.x] !== undefined &&
-        !peice.blks.includes(grid[v.y + 1][v.x]))
+        !piece.blks.includes(grid[v.y + 1][v.x]))
     ) {
       isTouching = true;
     }
@@ -115,16 +113,15 @@ function dropBlocks(grid: grid) {
   }
 }
 
-function dropPeice(peice: Tetriminoe, grid: grid) {
-  const initalY = peice.y;
-  while (!hasPieceBellow(peice, grid) && !isAtBottom(peice, grid)) {
-    peice.y += 1;
+function dropPiece(piece: Tetriminoe, grid: grid) {
+  const initalY = piece.y;
+  while (!hasPieceBellow(piece, grid)) {
+    piece.y += 1;
   }
-  return Math.max(peice.y - initalY, 1);
+  return Math.max(piece.y - initalY, 1);
 }
 
 export {
-  isAtBottom,
   isAtTop,
   isAtRightBarrier,
   isAtLeftBarrier,
@@ -132,5 +129,5 @@ export {
   hasPieceOnRight,
   hasPieceOnLeft,
   dropBlocks,
-  dropPeice,
+  dropPiece,
 };

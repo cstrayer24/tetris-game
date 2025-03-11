@@ -2,8 +2,8 @@ import { BLOCKH, BLOCKW } from "./constants.js";
 function createGrid(w, h) {
     return Array.from({ length: h }, () => new Array(w).fill(undefined));
 }
-function updateGrid(grid, peice, isInternalGrid) {
-    const blks = peice.blks;
+function updateGrid(grid, piece, isInternalGrid) {
+    const blks = piece.blks;
     const xKey = isInternalGrid ? "ix" : "x";
     const yKey = isInternalGrid ? "iy" : "y";
     blks.forEach((blk) => {

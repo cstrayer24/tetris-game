@@ -1,12 +1,12 @@
 import { BLOCKH, BLOCKW } from "./constants.js";
-import { Block, Tetriminoe } from "./peices.js";
+import { Block, Tetriminoe } from "./pieces.js";
 
 type grid = Block[][];
 function createGrid(w: number, h: number): grid {
   return Array.from({ length: h }, () => new Array(w).fill(undefined));
 }
-function updateGrid(grid: grid, peice: Tetriminoe, isInternalGrid?: boolean) {
-  const blks = peice.blks;
+function updateGrid(grid: grid, piece: Tetriminoe, isInternalGrid?: boolean) {
+  const blks = piece.blks;
   const xKey = isInternalGrid ? "ix" : "x";
   const yKey = isInternalGrid ? "iy" : "y";
   blks.forEach((blk) => {
