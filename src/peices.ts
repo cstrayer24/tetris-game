@@ -6,8 +6,7 @@ import {
   scaleInternalToGameboardGrid,
   updateGrid,
   setBlockPosToInternalGridPos,
-  swapRowsAndCols,
-  reverseRows,
+  rotateGrid,
 } from "./grid.js";
 
 class Block {
@@ -93,7 +92,7 @@ class Tetriminoe {
       IgridClone[blk.iy][blk.ix] = blk;
     });
 
-    IgridClone = swapRowsAndCols(reverseRows(IgridClone));
+    IgridClone = rotateGrid(IgridClone);
     setBlockPosToInternalGridPos(IgridClone);
     scaleInternalToGameboardGrid(IgridClone, blksClone[this.rotationPoint]);
 
@@ -163,7 +162,7 @@ class Straight extends Tetriminoe {
         this.color
       ),
     ];
-    this.rotationPoint = 0;
+    this.rotationPoint = 1;
     updateGrid(this.internalGrid, this, true);
     scaleInternalToGameboardGrid(this.internalGrid, this.blks[0]);
   }
@@ -281,7 +280,7 @@ class Tri extends Tetriminoe {
         this.color
       ),
     ];
-    this.rotationPoint = 3;
+    this.rotationPoint = 0;
     updateGrid(this.internalGrid, this, true);
     scaleInternalToGameboardGrid(this.internalGrid, this.blks[3]);
   }
@@ -422,6 +421,7 @@ class LeftwardL extends Tetriminoe {
         this.color
       ),
     ];
+    this.rotationPoint = 1;
     updateGrid(this.internalGrid, this, true);
     scaleInternalToGameboardGrid(this.internalGrid, this.blks[0]);
   }
@@ -468,6 +468,7 @@ class RightwardL extends Tetriminoe {
         this.color
       ),
     ];
+    this.rotationPoint = 1;
     updateGrid(this.internalGrid, this, true);
     scaleInternalToGameboardGrid(this.internalGrid, this.blks[0]);
   }

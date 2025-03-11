@@ -1,6 +1,6 @@
 import { BLOCKH, BLOCKW, IGRIDH, IGRIDW } from "./constants.js";
 import { drawBlock } from "./drawUtils.js";
-import { createGrid, scaleInternalToGameboardGrid, updateGrid, setBlockPosToInternalGridPos, swapRowsAndCols, reverseRows, } from "./grid.js";
+import { createGrid, scaleInternalToGameboardGrid, updateGrid, setBlockPosToInternalGridPos, rotateGrid, } from "./grid.js";
 class Block {
     x;
     y;
@@ -62,7 +62,7 @@ class Tetriminoe {
         blksClone.forEach((blk) => {
             IgridClone[blk.iy][blk.ix] = blk;
         });
-        IgridClone = swapRowsAndCols(reverseRows(IgridClone));
+        IgridClone = rotateGrid(IgridClone);
         setBlockPosToInternalGridPos(IgridClone);
         scaleInternalToGameboardGrid(IgridClone, blksClone[this.rotationPoint]);
         for (const blk of blksClone) {
@@ -93,7 +93,7 @@ class Straight extends Tetriminoe {
             new Block(this.px, this.py, Math.floor(this.internalGrid.length / 2), 2, BLOCKW, BLOCKH, this.color),
             new Block(this.px, this.py, Math.floor(this.internalGrid.length / 2), 3, BLOCKW, BLOCKH, this.color),
         ];
-        this.rotationPoint = 0;
+        this.rotationPoint = 1;
         updateGrid(this.internalGrid, this, true);
         scaleInternalToGameboardGrid(this.internalGrid, this.blks[0]);
     }
@@ -143,7 +143,7 @@ class Tri extends Tetriminoe {
             new Block(x, y, Math.floor(this.internalGrid[0].length / 2) - 1, Math.floor(this.internalGrid.length / 2) + 1, BLOCKW, BLOCKH, this.color),
             new Block(x, y, Math.floor(this.internalGrid[0].length / 2), Math.floor(this.internalGrid.length / 2), BLOCKW, BLOCKH, this.color),
         ];
-        this.rotationPoint = 3;
+        this.rotationPoint = 0;
         updateGrid(this.internalGrid, this, true);
         scaleInternalToGameboardGrid(this.internalGrid, this.blks[3]);
     }
@@ -185,6 +185,7 @@ class LeftwardL extends Tetriminoe {
             new Block(this.px, this.py, Math.floor(this.internalGrid.length / 2), 2, BLOCKW, BLOCKH, this.color),
             new Block(this.px, this.py, Math.floor(this.internalGrid.length / 2) - 1, 2, BLOCKW, BLOCKH, this.color),
         ];
+        this.rotationPoint = 1;
         updateGrid(this.internalGrid, this, true);
         scaleInternalToGameboardGrid(this.internalGrid, this.blks[0]);
     }
@@ -198,6 +199,7 @@ class RightwardL extends Tetriminoe {
             new Block(this.px, this.py + 2, Math.floor(this.internalGrid[0].length / 2), 2, BLOCKW, BLOCKH, this.color),
             new Block(this.px + 1, this.py + 2, Math.floor(this.internalGrid[0].length / 2) + 1, 2, BLOCKW, BLOCKH, this.color),
         ];
+        this.rotationPoint = 1;
         updateGrid(this.internalGrid, this, true);
         scaleInternalToGameboardGrid(this.internalGrid, this.blks[0]);
     }

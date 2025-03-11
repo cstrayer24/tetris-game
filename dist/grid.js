@@ -1,24 +1,19 @@
 import { BLOCKH, BLOCKW } from "./constants.js";
 function createGrid(w, h) {
-    const grid = [];
-    for (let i = 0; i < h; i++) {
-        const row = new Array(w).fill(undefined);
-        grid.push(row);
-    }
-    return grid;
+    return Array.from({ length: h }, () => new Array(w).fill(undefined));
 }
 function updateGrid(grid, peice, isInternalGrid) {
     const blks = peice.blks;
     const xKey = isInternalGrid ? "ix" : "x";
     const yKey = isInternalGrid ? "iy" : "y";
-    blks.forEach((v) => {
-        if (v[yKey] > grid.length - 1 || grid[yKey] < 0) {
+    blks.forEach((blk) => {
+        //this might be unnecessary
+        if (blk[yKey] > grid.length - 1 ||
+            grid[yKey] < 0 ||
+            blk[xKey] > grid[blk[yKey]].length - 1) {
             return;
         }
-        if (v[xKey] > grid[v[yKey]].length - 1) {
-            return;
-        }
-        grid[v[yKey]][v[xKey]] = v;
+        grid[blk[yKey]][blk[xKey]] = blk;
     });
     for (let i = 0; i < grid.length; i++) {
         for (let j = 0; j < grid[i].length; j++) {
@@ -49,41 +44,24 @@ function setBlockPosToInternalGridPos(Igrid) {
         }
     }
 }
-function resetBlockToAnchorBlock(grid, AnchorBlock) {
-    for (let i = 0; i < grid.length; i++) {
-        for (let j = 0; j < grid[i].length; j++) {
-            if (typeof grid[i][j] === "undefined") {
-                continue;
-            }
-            grid[i][j].x = AnchorBlock.x;
-            grid[i][j].y = AnchorBlock.y;
-        }
-    }
-}
 function scaleInternalToGameboardGrid(Igrid, BaseBlock) {
-    resetBlockToAnchorBlock(Igrid, BaseBlock);
     for (let i = 0; i < Igrid.length; i++) {
         for (let j = 0; j < Igrid[i].length; j++) {
             if (typeof Igrid[i][j] === "undefined") {
                 continue;
             }
+            Igrid[i][j].x = BaseBlock.x;
+            Igrid[i][j].y = BaseBlock.y;
             Igrid[i][j].y += Igrid[i][j].iy - BaseBlock.iy;
             Igrid[i][j].x += Igrid[i][j].ix - BaseBlock.ix;
         }
     }
 }
-function reverseRows(grid) {
-    const reverseGrid = [];
-    for (let i = grid.length - 1; i >= 0; i--) {
-        reverseGrid.push(grid[i]);
-    }
-    return reverseGrid;
-}
-function swapRowsAndCols(grid) {
+function rotateGrid(grid) {
     const reversedGrid = [];
-    for (let i = 0; i < grid[0].length; i++) {
+    for (let i = 0; i < grid.length; i++) {
         const newRow = [];
-        for (let j = 0; j < grid.length; j++) {
+        for (let j = grid.length - 1; j > -1; j--) {
             newRow.push(grid[j][i]);
         }
         reversedGrid.push(newRow);
@@ -94,4 +72,4 @@ function createGridBoard(gameBoard, grid) {
     gameBoard.width = grid[0].length * BLOCKW;
     gameBoard.height = grid.length * BLOCKH;
 }
-export { createGrid, updateGrid, createGridBoard, swapRowsAndCols, scaleInternalToGameboardGrid, setBlockPosToInternalGridPos, reverseRows, clearGrid, };
+export { createGrid, updateGrid, createGridBoard, rotateGrid, scaleInternalToGameboardGrid, setBlockPosToInternalGridPos, clearGrid, };

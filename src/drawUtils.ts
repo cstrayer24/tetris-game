@@ -21,20 +21,8 @@ function drawGridLines(ctx: CanvasRenderingContext2D, grid: Block[][]) {
   ctx.stroke();
   ctx.strokeStyle = "#00000";
 }
-const clearBehind = (ctx: CanvasRenderingContext2D, block: Block) =>
-  ctx.clearRect(block.x - block.w, block.y, block.w, block.h);
-const clearAhead = (ctx: CanvasRenderingContext2D, block: Block) =>
-  ctx.clearRect(block.x + block.w, block.y, block.w, block.h);
-const clearAbove = (ctx: CanvasRenderingContext2D, block: Block) =>
-  ctx.clearRect(block.x, block.y - block.h, block.w, block.h);
+
 const clrscrn = (ctx: CanvasRenderingContext2D) =>
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-export {
-  clearBehind,
-  clearAhead,
-  clearAbove,
-  drawBlock,
-  drawGridLines,
-  clrscrn,
-};
+export { drawBlock, drawGridLines, clrscrn };

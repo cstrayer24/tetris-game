@@ -18,8 +18,5 @@ function drawGridLines(ctx, grid) {
     ctx.stroke();
     ctx.strokeStyle = "#00000";
 }
-const clearBehind = (ctx, block) => ctx.clearRect(block.x - block.w, block.y, block.w, block.h);
-const clearAhead = (ctx, block) => ctx.clearRect(block.x + block.w, block.y, block.w, block.h);
-const clearAbove = (ctx, block) => ctx.clearRect(block.x, block.y - block.h, block.w, block.h);
 const clrscrn = (ctx) => ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-export { clearBehind, clearAhead, clearAbove, drawBlock, drawGridLines, clrscrn, };
+export { drawBlock, drawGridLines, clrscrn };

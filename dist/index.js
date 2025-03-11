@@ -64,13 +64,13 @@ function handleInput(Game, ev) {
             currPeice.rotate(grid);
             //wall kicks
             while (currPeice.blks.find((blk) => blk.y < 0)) {
-                currPeice.y += 1;
+                currPeice.y++;
             }
             while (currPeice.blks.find((blk) => blk.x < 0)) {
-                currPeice.x += 1;
+                currPeice.x++;
             }
             while (currPeice.blks.find((blk) => blk.x >= Game.grid[0].length)) {
-                currPeice.x -= 1;
+                currPeice.x--;
             }
             updateGrid(grid, currPeice);
             break;
@@ -126,8 +126,7 @@ function playGame(Game) {
         clrscrn(Game.ctx);
         updateGrid(Game.grid, Game.currPeice);
         renderGame(Game);
-        if (isAtBottom(Game.currPeice, Game.grid) ||
-            hasPieceBellow(Game.currPeice, Game.grid)) {
+        if (hasPieceBellow(Game.currPeice, Game.grid)) {
             if (Game.timeoutRef === 0) {
                 Game.timeoutRef = setTimeout(() => {
                     handleDrop(Game);
@@ -168,8 +167,7 @@ function resetGame(Game) {
     playGame(Game);
 }
 function handleDrop(Game) {
-    if (!(hasPieceBellow(Game.currPeice, Game.grid) ||
-        isAtBottom(Game.currPeice, Game.grid))) {
+    if (!hasPieceBellow(Game.currPeice, Game.grid)) {
         return;
     }
     Game.currPeice = getRandomBlock();

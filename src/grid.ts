@@ -2,27 +2,23 @@ import { BLOCKH, BLOCKW } from "./constants.js";
 import { Block, Tetriminoe } from "./peices.js";
 
 type grid = Block[][];
-
 function createGrid(w: number, h: number): grid {
-  const grid = [];
-  for (let i = 0; i < h; i++) {
-    const row = new Array(w).fill(undefined);
-    grid.push(row);
-  }
-  return grid;
+  return Array.from({ length: h }, () => new Array(w).fill(undefined));
 }
 function updateGrid(grid: grid, peice: Tetriminoe, isInternalGrid?: boolean) {
   const blks = peice.blks;
   const xKey = isInternalGrid ? "ix" : "x";
   const yKey = isInternalGrid ? "iy" : "y";
-  blks.forEach((v) => {
-    if (v[yKey] > grid.length - 1 || grid[yKey] < 0) {
+  blks.forEach((blk) => {
+    //this might be unnecessary
+    if (
+      blk[yKey] > grid.length - 1 ||
+      grid[yKey] < 0 ||
+      blk[xKey] > grid[blk[yKey]].length - 1
+    ) {
       return;
     }
-    if (v[xKey] > grid[v[yKey]].length - 1) {
-      return;
-    }
-    grid[v[yKey]][v[xKey]] = v;
+    grid[blk[yKey]][blk[xKey]] = blk;
   });
   for (let i = 0; i < grid.length; i++) {
     for (let j = 0; j < grid[i].length; j++) {
@@ -54,49 +50,31 @@ function setBlockPosToInternalGridPos(Igrid: grid) {
     }
   }
 }
-function resetBlockToAnchorBlock(grid: grid, AnchorBlock: Block) {
-  for (let i = 0; i < grid.length; i++) {
-    for (let j = 0; j < grid[i].length; j++) {
-      if (typeof grid[i][j] === "undefined") {
-        continue;
-      }
-      grid[i][j].x = AnchorBlock.x;
-      grid[i][j].y = AnchorBlock.y;
-    }
-  }
-}
 function scaleInternalToGameboardGrid(Igrid: grid, BaseBlock: Block) {
-  resetBlockToAnchorBlock(Igrid, BaseBlock);
   for (let i = 0; i < Igrid.length; i++) {
     for (let j = 0; j < Igrid[i].length; j++) {
       if (typeof Igrid[i][j] === "undefined") {
         continue;
       }
-
+      Igrid[i][j].x = BaseBlock.x;
+      Igrid[i][j].y = BaseBlock.y;
       Igrid[i][j].y += Igrid[i][j].iy - BaseBlock.iy;
       Igrid[i][j].x += Igrid[i][j].ix - BaseBlock.ix;
     }
   }
 }
-function reverseRows(grid: grid) {
-  const reverseGrid = [];
-  for (let i = grid.length - 1; i >= 0; i--) {
-    reverseGrid.push(grid[i]);
-  }
-  return reverseGrid;
-}
-function swapRowsAndCols(grid: grid) {
+
+function rotateGrid(grid: grid) {
   const reversedGrid = [];
-  for (let i = 0; i < grid[0].length; i++) {
+  for (let i = 0; i < grid.length; i++) {
     const newRow = [];
-    for (let j = 0; j < grid.length; j++) {
+    for (let j = grid.length - 1; j > -1; j--) {
       newRow.push(grid[j][i]);
     }
     reversedGrid.push(newRow);
   }
   return reversedGrid;
 }
-
 function createGridBoard(gameBoard: HTMLCanvasElement, grid: grid) {
   gameBoard.width = grid[0].length * BLOCKW;
   gameBoard.height = grid.length * BLOCKH;
@@ -107,9 +85,8 @@ export {
   createGrid,
   updateGrid,
   createGridBoard,
-  swapRowsAndCols,
+  rotateGrid,
   scaleInternalToGameboardGrid,
   setBlockPosToInternalGridPos,
-  reverseRows,
   clearGrid,
 };
