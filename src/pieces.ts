@@ -36,6 +36,23 @@ class Block {
     this.iy = iy;
   }
 }
+class TexturedBlock extends Block {
+  texturePath: string;
+  imgel: CanvasImageSource;
+  constructor(
+    x: number,
+    y: number,
+    ix: number,
+    iy: number,
+    texturepath: string
+  ) {
+    super(x, y, ix, iy, BLOCKW, BLOCKH, "white");
+    this.texturePath = texturepath;
+    this.imgel = document.createElement("img");
+  }
+
+  draw(ctx: CanvasRenderingContext2D) {}
+}
 
 class Tetriminoe {
   protected px: number;

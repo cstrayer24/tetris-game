@@ -26,6 +26,7 @@ import {
   dropBlocks,
   dropPiece,
 } from "./physics.js";
+import { TEXTUREWRAPPERID } from "./constants.js";
 type timing_t = {
   interval: number;
   lastTime: number;
@@ -65,6 +66,13 @@ function getRandomBlock(x, y): Tetriminoe {
 
 function updateScoreBoard(Game: game) {
   Game.scoreBoard.textContent = `${Game.score}`;
+}
+
+function init_textures() {
+  const wrapperEl = document.createElement("div");
+  wrapperEl.id = `#${TEXTUREWRAPPERID}`;
+  wrapperEl.style.display = "none";
+  
 }
 function initGame(Game: game, canvas: HTMLCanvasElement) {
   Game.grid = createGrid(10, 22);
