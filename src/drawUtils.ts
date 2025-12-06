@@ -3,6 +3,10 @@ import { grid } from "./grid.js";
 import { Block } from "./pieces.js";
 
 function drawBlock(block: Block, ctx: CanvasRenderingContext2D) {
+  if (Object.hasOwn(Object.getPrototypeOf(block), "draw")) {
+    block.draw(ctx);
+    return;
+  }
   ctx.fillStyle = block.color;
   ctx.fillRect(block.x * BLOCKW, block.y * BLOCKH, block.w, block.h);
   ctx.fillStyle = "#00000";

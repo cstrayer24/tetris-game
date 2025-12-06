@@ -53,13 +53,13 @@ const controlButton: HTMLButtonElement = document.querySelector("#ctlbtn");
 
 function getRandomBlock(x, y): Tetriminoe {
   const pieces = [
-    LeftwardZigZag,
-    RightwardZigZag,
-    Square,
+    // LeftwardZigZag,
+    // RightwardZigZag,
+    // Square,
     Straight,
-    Tri,
-    RightwardL,
-    LeftwardL,
+    // Tri,
+    // RightwardL,
+    // LeftwardL,
   ];
   return new pieces[Math.floor(Math.random() * pieces.length)](x, y);
 }
@@ -70,9 +70,9 @@ function updateScoreBoard(Game: game) {
 
 function init_textures() {
   const wrapperEl = document.createElement("div");
-  wrapperEl.id = `#${TEXTUREWRAPPERID}`;
+  wrapperEl.id = `${TEXTUREWRAPPERID}`;
   wrapperEl.style.display = "none";
-  
+  document.body.appendChild(wrapperEl);
 }
 function initGame(Game: game, canvas: HTMLCanvasElement) {
   Game.grid = createGrid(10, 22);
@@ -89,6 +89,7 @@ function initGame(Game: game, canvas: HTMLCanvasElement) {
   Game.scoreMultiplier = 1;
   Game.linesCleared = 0;
   Game.nextLineThreshold = 10;
+  init_textures();
 }
 
 function handleInput(

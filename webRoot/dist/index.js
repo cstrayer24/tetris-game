@@ -1,23 +1,30 @@
 import { clrscrn, drawBlock, drawGridLines } from "./drawUtils.js";
 import { updateGrid, createGrid, createGridBoard, clearGrid, } from "./grid.js";
-import { LeftwardZigZag, Square, Straight, Tri, RightwardZigZag, LeftwardL, RightwardL, } from "./pieces.js";
+import { Straight, } from "./pieces.js";
 import { isAtRightBarrier, isAtLeftBarrier, hasPieceBellow, hasPieceOnRight, hasPieceOnLeft, isAtTop, dropBlocks, dropPiece, } from "./physics.js";
+import { TEXTUREWRAPPERID } from "./constants.js";
 const Game = {};
 const controlButton = document.querySelector("#ctlbtn");
 function getRandomBlock(x, y) {
     const pieces = [
-        LeftwardZigZag,
-        RightwardZigZag,
-        Square,
+        // LeftwardZigZag,
+        // RightwardZigZag,
+        // Square,
         Straight,
-        Tri,
-        RightwardL,
-        LeftwardL,
+        // Tri,
+        // RightwardL,
+        // LeftwardL,
     ];
     return new pieces[Math.floor(Math.random() * pieces.length)](x, y);
 }
 function updateScoreBoard(Game) {
     Game.scoreBoard.textContent = `${Game.score}`;
+}
+function init_textures() {
+    const wrapperEl = document.createElement("div");
+    wrapperEl.id = `${TEXTUREWRAPPERID}`;
+    wrapperEl.style.display = "none";
+    document.body.appendChild(wrapperEl);
 }
 function initGame(Game, canvas) {
     Game.grid = createGrid(10, 22);
@@ -34,6 +41,7 @@ function initGame(Game, canvas) {
     Game.scoreMultiplier = 1;
     Game.linesCleared = 0;
     Game.nextLineThreshold = 10;
+    init_textures();
 }
 function handleInput(Game, ev, inputMap) {
     if (Object.keys(inputMap).includes(ev.key) && inputMap[ev.key]) {

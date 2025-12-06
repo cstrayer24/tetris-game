@@ -1,5 +1,9 @@
 import { BLOCKH, BLOCKW } from "./constants.js";
 function drawBlock(block, ctx) {
+    if (Object.hasOwn(Object.getPrototypeOf(block), "draw")) {
+        block.draw(ctx);
+        return;
+    }
     ctx.fillStyle = block.color;
     ctx.fillRect(block.x * BLOCKW, block.y * BLOCKH, block.w, block.h);
     ctx.fillStyle = "#00000";

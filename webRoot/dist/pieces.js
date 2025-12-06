@@ -1,4 +1,4 @@
-import { BLOCKH, BLOCKW, IGRIDH, IGRIDW } from "./constants.js";
+import { BLOCKH, BLOCKW, colorTextureLUT, IGRIDH, IGRIDW, TEXTUREWRAPPERID, } from "./constants.js";
 import { drawBlock } from "./drawUtils.js";
 import { createGrid, scaleInternalToGameboardGrid, updateGrid, setBlockPosToInternalGridPos, rotateGrid, } from "./grid.js";
 class Block {
@@ -17,6 +17,34 @@ class Block {
         this.y = y;
         this.ix = ix;
         this.iy = iy;
+    }
+}
+class TexturedBlock extends Block {
+    texturePath;
+    // imgel: CanvasImageSource;
+    constructor(x, y, ix, iy, width, height, color) {
+        super(x, y, ix, iy, width, height, color);
+        if (Object.keys(colorTextureLUT).includes(color)) {
+            this.texturePath = colorTextureLUT[color];
+        }
+        const textureContainer = document.querySelector(`#${TEXTUREWRAPPERID}`);
+        if (textureContainer === null) {
+            const wrapperEl = document.createElement("div");
+            wrapperEl.id = `#${TEXTUREWRAPPERID}`;
+            wrapperEl.style.display = "none";
+            document.body.appendChild(wrapperEl);
+        }
+        const imgel = document.querySelector(`#texture_${color}`);
+        if (imgel === null) {
+            const newImg = document.createElement("img");
+            newImg.id = `texture_${color}`;
+            newImg.src = this.texturePath;
+            textureContainer.appendChild(newImg);
+        }
+    }
+    draw(ctx) {
+        const imgel = document.querySelector(`#texture_${this.color}`);
+        ctx.drawImage(imgel, this.x * BLOCKW, this.y * BLOCKH, BLOCKW, BLOCKH);
     }
 }
 class Tetriminoe {
@@ -58,6 +86,7 @@ class Tetriminoe {
     }
     rotate(outerGrid) {
         const blksClone = structuredClone(this.blks);
+        console.log(blksClone);
         let IgridClone = createGrid(IGRIDW, IGRIDH);
         blksClone.forEach((blk) => {
             IgridClone[blk.iy][blk.ix] = blk;
@@ -88,10 +117,10 @@ class Straight extends Tetriminoe {
     constructor(x, y) {
         super(x, y, "blue");
         this.blks = [
-            new Block(this.px, this.py, Math.floor(this.internalGrid.length / 2), 0, BLOCKW, BLOCKH, this.color),
-            new Block(this.px, this.py, Math.floor(this.internalGrid.length / 2), 1, BLOCKW, BLOCKH, this.color),
-            new Block(this.px, this.py, Math.floor(this.internalGrid.length / 2), 2, BLOCKW, BLOCKH, this.color),
-            new Block(this.px, this.py, Math.floor(this.internalGrid.length / 2), 3, BLOCKW, BLOCKH, this.color),
+            new TexturedBlock(this.px, this.py, Math.floor(this.internalGrid.length / 2), 0, BLOCKW, BLOCKH, this.color),
+            new TexturedBlock(this.px, this.py, Math.floor(this.internalGrid.length / 2), 1, BLOCKW, BLOCKH, this.color),
+            new TexturedBlock(this.px, this.py, Math.floor(this.internalGrid.length / 2), 2, BLOCKW, BLOCKH, this.color),
+            new TexturedBlock(this.px, this.py, Math.floor(this.internalGrid.length / 2), 3, BLOCKW, BLOCKH, this.color),
         ];
         this.rotationPoint = 1;
         updateGrid(this.internalGrid, this, true);

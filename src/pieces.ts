@@ -1,4 +1,11 @@
-import { BLOCKH, BLOCKW, IGRIDH, IGRIDW } from "./constants.js";
+import {
+  BLOCKH,
+  BLOCKW,
+  colorTextureLUT,
+  IGRIDH,
+  IGRIDW,
+  TEXTUREWRAPPERID,
+} from "./constants.js";
 import { drawBlock } from "./drawUtils.js";
 import {
   createGrid,
@@ -38,20 +45,46 @@ class Block {
 }
 class TexturedBlock extends Block {
   texturePath: string;
-  imgel: CanvasImageSource;
+  // imgel: CanvasImageSource;
   constructor(
     x: number,
     y: number,
     ix: number,
     iy: number,
-    texturepath: string
+    width: number,
+    height: number,
+    color: string
   ) {
-    super(x, y, ix, iy, BLOCKW, BLOCKH, "white");
-    this.texturePath = texturepath;
-    this.imgel = document.createElement("img");
+    super(x, y, ix, iy, width, height, color);
+    if (Object.keys(colorTextureLUT).includes(color)) {
+      this.texturePath = colorTextureLUT[color];
+    }
+
+    const textureContainer = document.querySelector(`#${TEXTUREWRAPPERID}`);
+    if (textureContainer === null) {
+      const wrapperEl = document.createElement("div");
+      wrapperEl.id = `#${TEXTUREWRAPPERID}`;
+      wrapperEl.style.display = "none";
+      document.body.appendChild(wrapperEl);
+    }
+    const imgel = document.querySelector(
+      `#texture_${color}`
+    ) as HTMLImageElement;
+
+    if (imgel === null) {
+      const newImg = document.createElement("img");
+      newImg.id = `texture_${color}`;
+      newImg.src = this.texturePath;
+      textureContainer.appendChild(newImg);
+    }
   }
 
-  draw(ctx: CanvasRenderingContext2D) {}
+  draw(ctx: CanvasRenderingContext2D) {
+    const imgel = document.querySelector(
+      `#texture_${this.color}`
+    ) as HTMLImageElement;
+    ctx.drawImage(imgel, this.x * BLOCKW, this.y * BLOCKH, BLOCKW, BLOCKH);
+  }
 }
 
 class Tetriminoe {
@@ -104,6 +137,7 @@ class Tetriminoe {
 
   rotate(outerGrid: grid) {
     const blksClone = structuredClone(this.blks);
+    console.log(blksClone);
     let IgridClone = createGrid(IGRIDW, IGRIDH);
     blksClone.forEach((blk) => {
       IgridClone[blk.iy][blk.ix] = blk;
@@ -142,7 +176,7 @@ class Straight extends Tetriminoe {
   constructor(x: number, y: number) {
     super(x, y, "blue");
     this.blks = [
-      new Block(
+      new TexturedBlock(
         this.px,
         this.py,
         Math.floor(this.internalGrid.length / 2),
@@ -151,7 +185,7 @@ class Straight extends Tetriminoe {
         BLOCKH,
         this.color
       ),
-      new Block(
+      new TexturedBlock(
         this.px,
         this.py,
         Math.floor(this.internalGrid.length / 2),
@@ -160,7 +194,7 @@ class Straight extends Tetriminoe {
         BLOCKH,
         this.color
       ),
-      new Block(
+      new TexturedBlock(
         this.px,
         this.py,
         Math.floor(this.internalGrid.length / 2),
@@ -169,7 +203,7 @@ class Straight extends Tetriminoe {
         BLOCKH,
         this.color
       ),
-      new Block(
+      new TexturedBlock(
         this.px,
         this.py,
         Math.floor(this.internalGrid.length / 2),
