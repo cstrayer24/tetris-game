@@ -53,14 +53,15 @@ const controlButton: HTMLButtonElement = document.querySelector("#ctlbtn");
 
 function getRandomBlock(x, y): Tetriminoe {
   const pieces = [
-    // LeftwardZigZag,
-    // RightwardZigZag,
-    // Square,
+    LeftwardZigZag,
+    RightwardZigZag,
+    Square,
     Straight,
-    // Tri,
-    // RightwardL,
-    // LeftwardL,
+    Tri,
+    RightwardL,
+    LeftwardL,
   ];
+
   return new pieces[Math.floor(Math.random() * pieces.length)](x, y);
 }
 

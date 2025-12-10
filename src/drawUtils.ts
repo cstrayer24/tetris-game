@@ -1,9 +1,12 @@
 import { BLOCKH, BLOCKW } from "./constants.js";
 import { grid } from "./grid.js";
-import { Block } from "./pieces.js";
+import { Block, TexturedBlock } from "./pieces.js";
 
-function drawBlock(block: Block, ctx: CanvasRenderingContext2D) {
-  if (Object.hasOwn(Object.getPrototypeOf(block), "draw")) {
+function drawBlock(
+  block: Block | TexturedBlock,
+  ctx: CanvasRenderingContext2D
+) {
+  if (block instanceof TexturedBlock) {
     block.draw(ctx);
     return;
   }

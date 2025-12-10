@@ -56,7 +56,7 @@ class TexturedBlock extends Block {
     color: string
   ) {
     super(x, y, ix, iy, width, height, color);
-    if (Object.keys(colorTextureLUT).includes(color)) {
+    if (Object.hasOwn(colorTextureLUT, color)) {
       this.texturePath = colorTextureLUT[color];
     }
 
@@ -164,11 +164,17 @@ class Tetriminoe {
         return;
       }
     }
-    this.blks.forEach((blk) => {
-      outerGrid[blk.y][blk.x] = undefined;
-    });
-    this.blks = blksClone;
-    this.internalGrid = IgridClone;
+    for (let i = 0; i < this.blks.length; i++) {
+      const currBlk = this.blks[i];
+      outerGrid[currBlk.y][currBlk.x] = undefined;
+      currBlk.ix = blksClone[i].ix;
+      currBlk.iy = blksClone[i].iy;
+      currBlk.x = blksClone[i].x;
+      currBlk.y = blksClone[i].y;
+      this.internalGrid[currBlk.iy][currBlk.ix] = currBlk;
+    }
+    // this.blks = blksClone;
+    // this.internalGrid = IgridClone;
   }
 }
 
@@ -223,7 +229,7 @@ class Square extends Tetriminoe {
   constructor(x: number, y: number) {
     super(x, y, "yellow");
     this.blks = [
-      new Block(
+      new TexturedBlock(
         this.px,
         this.py,
         Math.floor(this.internalGrid[0].length / 2),
@@ -232,7 +238,7 @@ class Square extends Tetriminoe {
         BLOCKH,
         this.color
       ),
-      new Block(
+      new TexturedBlock(
         this.px,
         this.py,
         Math.floor(this.internalGrid[0].length / 2) + 1,
@@ -241,7 +247,7 @@ class Square extends Tetriminoe {
         BLOCKH,
         this.color
       ),
-      new Block(
+      new TexturedBlock(
         this.px,
         this.py,
         Math.floor(this.internalGrid[0].length / 2),
@@ -250,7 +256,7 @@ class Square extends Tetriminoe {
         BLOCKH,
         this.color
       ),
-      new Block(
+      new TexturedBlock(
         this.px,
         this.py,
         Math.floor(this.internalGrid[0].length / 2) + 1,
@@ -294,7 +300,7 @@ class Tri extends Tetriminoe {
   constructor(x: number, y: number) {
     super(x, y, "purple");
     this.blks = [
-      new Block(
+      new TexturedBlock(
         x,
         y,
         Math.floor(this.internalGrid[0].length / 2),
@@ -303,7 +309,7 @@ class Tri extends Tetriminoe {
         BLOCKH,
         this.color
       ),
-      new Block(
+      new TexturedBlock(
         x,
         y,
         Math.floor(this.internalGrid[0].length / 2) + 1,
@@ -312,7 +318,7 @@ class Tri extends Tetriminoe {
         BLOCKH,
         this.color
       ),
-      new Block(
+      new TexturedBlock(
         x,
         y,
         Math.floor(this.internalGrid[0].length / 2) - 1,
@@ -321,7 +327,7 @@ class Tri extends Tetriminoe {
         BLOCKH,
         this.color
       ),
-      new Block(
+      new TexturedBlock(
         x,
         y,
         Math.floor(this.internalGrid[0].length / 2),
@@ -341,7 +347,7 @@ class LeftwardZigZag extends Tetriminoe {
   constructor(x: number, y: number) {
     super(x, y, "green");
     this.blks = [
-      new Block(
+      new TexturedBlock(
         this.px,
         this.py,
         Math.floor(this.internalGrid[0].length / 2) - 1,
@@ -350,7 +356,7 @@ class LeftwardZigZag extends Tetriminoe {
         BLOCKH,
         this.color
       ),
-      new Block(
+      new TexturedBlock(
         this.px,
         this.py,
         Math.floor(this.internalGrid[0].length / 2),
@@ -359,7 +365,7 @@ class LeftwardZigZag extends Tetriminoe {
         BLOCKH,
         this.color
       ),
-      new Block(
+      new TexturedBlock(
         this.px,
         this.py,
         Math.floor(this.internalGrid[0].length / 2),
@@ -368,7 +374,7 @@ class LeftwardZigZag extends Tetriminoe {
         BLOCKH,
         this.color
       ),
-      new Block(
+      new TexturedBlock(
         this.px,
         this.py,
         Math.floor(this.internalGrid[0].length / 2) + 1,
@@ -388,7 +394,7 @@ class RightwardZigZag extends Tetriminoe {
   constructor(x: number, y: number) {
     super(x, y, "red");
     this.blks = [
-      new Block(
+      new TexturedBlock(
         this.px,
         this.py,
         Math.floor(this.internalGrid[0].length / 2) + 1,
@@ -397,7 +403,7 @@ class RightwardZigZag extends Tetriminoe {
         BLOCKH,
         this.color
       ),
-      new Block(
+      new TexturedBlock(
         this.px,
         this.py,
         Math.floor(this.internalGrid[0].length / 2),
@@ -406,7 +412,7 @@ class RightwardZigZag extends Tetriminoe {
         BLOCKH,
         this.color
       ),
-      new Block(
+      new TexturedBlock(
         this.px,
         this.py,
         Math.floor(this.internalGrid[0].length / 2),
@@ -415,7 +421,7 @@ class RightwardZigZag extends Tetriminoe {
         BLOCKH,
         this.color
       ),
-      new Block(
+      new TexturedBlock(
         this.px,
         this.py,
         Math.floor(this.internalGrid[0].length / 2) - 1,
@@ -435,7 +441,7 @@ class LeftwardL extends Tetriminoe {
   constructor(x: number, y: number) {
     super(x, y, "pink");
     this.blks = [
-      new Block(
+      new TexturedBlock(
         this.px,
         this.py,
         Math.floor(this.internalGrid.length / 2),
@@ -444,7 +450,7 @@ class LeftwardL extends Tetriminoe {
         BLOCKH,
         this.color
       ),
-      new Block(
+      new TexturedBlock(
         this.px,
         this.py,
         Math.floor(this.internalGrid.length / 2),
@@ -453,7 +459,7 @@ class LeftwardL extends Tetriminoe {
         BLOCKH,
         this.color
       ),
-      new Block(
+      new TexturedBlock(
         this.px,
         this.py,
         Math.floor(this.internalGrid.length / 2),
@@ -462,7 +468,7 @@ class LeftwardL extends Tetriminoe {
         BLOCKH,
         this.color
       ),
-      new Block(
+      new TexturedBlock(
         this.px,
         this.py,
         Math.floor(this.internalGrid.length / 2) - 1,
@@ -482,7 +488,7 @@ class RightwardL extends Tetriminoe {
   constructor(x: number, y: number) {
     super(x, y, "orange");
     this.blks = [
-      new Block(
+      new TexturedBlock(
         this.px,
         this.py,
         Math.floor(this.internalGrid[0].length / 2),
@@ -491,7 +497,7 @@ class RightwardL extends Tetriminoe {
         BLOCKH,
         this.color
       ),
-      new Block(
+      new TexturedBlock(
         this.px,
         this.py + 1,
         Math.floor(this.internalGrid[0].length / 2),
@@ -500,7 +506,7 @@ class RightwardL extends Tetriminoe {
         BLOCKH,
         this.color
       ),
-      new Block(
+      new TexturedBlock(
         this.px,
         this.py + 2,
         Math.floor(this.internalGrid[0].length / 2),
@@ -509,7 +515,7 @@ class RightwardL extends Tetriminoe {
         BLOCKH,
         this.color
       ),
-      new Block(
+      new TexturedBlock(
         this.px + 1,
         this.py + 2,
         Math.floor(this.internalGrid[0].length / 2) + 1,
@@ -526,6 +532,7 @@ class RightwardL extends Tetriminoe {
 }
 export {
   Block,
+  TexturedBlock,
   Straight,
   Square,
   Tri,

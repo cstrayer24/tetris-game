@@ -1,19 +1,19 @@
 import { clrscrn, drawBlock, drawGridLines } from "./drawUtils.js";
 import { updateGrid, createGrid, createGridBoard, clearGrid, } from "./grid.js";
-import { Straight, } from "./pieces.js";
+import { LeftwardZigZag, Square, Straight, Tri, RightwardZigZag, LeftwardL, RightwardL, } from "./pieces.js";
 import { isAtRightBarrier, isAtLeftBarrier, hasPieceBellow, hasPieceOnRight, hasPieceOnLeft, isAtTop, dropBlocks, dropPiece, } from "./physics.js";
 import { TEXTUREWRAPPERID } from "./constants.js";
 const Game = {};
 const controlButton = document.querySelector("#ctlbtn");
 function getRandomBlock(x, y) {
     const pieces = [
-        // LeftwardZigZag,
-        // RightwardZigZag,
-        // Square,
+        LeftwardZigZag,
+        RightwardZigZag,
+        Square,
         Straight,
-        // Tri,
-        // RightwardL,
-        // LeftwardL,
+        Tri,
+        RightwardL,
+        LeftwardL,
     ];
     return new pieces[Math.floor(Math.random() * pieces.length)](x, y);
 }

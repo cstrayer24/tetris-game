@@ -1,6 +1,7 @@
 import { BLOCKH, BLOCKW } from "./constants.js";
+import { TexturedBlock } from "./pieces.js";
 function drawBlock(block, ctx) {
-    if (Object.hasOwn(Object.getPrototypeOf(block), "draw")) {
+    if (block instanceof TexturedBlock) {
         block.draw(ctx);
         return;
     }
