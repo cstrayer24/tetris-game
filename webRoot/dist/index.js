@@ -2,7 +2,7 @@ import { clrscrn, drawBlock, drawGridLines } from "./drawUtils.js";
 import { updateGrid, createGrid, createGridBoard, clearGrid, } from "./grid.js";
 import { LeftwardZigZag, Square, Straight, Tri, RightwardZigZag, LeftwardL, RightwardL, } from "./pieces.js";
 import { isAtRightBarrier, isAtLeftBarrier, hasPieceBellow, hasPieceOnRight, hasPieceOnLeft, isAtTop, dropBlocks, dropPiece, } from "./physics.js";
-import { TEXTUREWRAPPERID } from "./constants.js";
+import { colorTextureLUT, GRIDH, GRIDW, TEXTUREWRAPPERID, } from "./constants.js";
 const Game = {};
 const controlButton = document.querySelector("#ctlbtn");
 function getRandomBlock(x, y) {
@@ -25,9 +25,16 @@ function init_textures() {
     wrapperEl.id = `${TEXTUREWRAPPERID}`;
     wrapperEl.style.display = "none";
     document.body.appendChild(wrapperEl);
+    const colors = Object.keys(colorTextureLUT);
+    for (let i = 0; i < colors.length; i++) {
+        const img = new Image();
+        img.src = colorTextureLUT[colors[i]];
+        img.id = `texture_${colors[i]}`;
+        wrapperEl.appendChild(img);
+    }
 }
 function initGame(Game, canvas) {
-    Game.grid = createGrid(10, 22);
+    Game.grid = createGrid(GRIDW, GRIDH);
     Game.gameBoard = canvas;
     Game.ctx = Game.gameBoard.getContext("2d");
     createGridBoard(Game.gameBoard, Game.grid);

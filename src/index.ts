@@ -26,7 +26,12 @@ import {
   dropBlocks,
   dropPiece,
 } from "./physics.js";
-import { TEXTUREWRAPPERID } from "./constants.js";
+import {
+  colorTextureLUT,
+  GRIDH,
+  GRIDW,
+  TEXTUREWRAPPERID,
+} from "./constants.js";
 type timing_t = {
   interval: number;
   lastTime: number;
@@ -74,9 +79,16 @@ function init_textures() {
   wrapperEl.id = `${TEXTUREWRAPPERID}`;
   wrapperEl.style.display = "none";
   document.body.appendChild(wrapperEl);
+  const colors = Object.keys(colorTextureLUT);
+  for (let i = 0; i < colors.length; i++) {
+    const img = new Image();
+    img.src = colorTextureLUT[colors[i]];
+    img.id = `texture_${colors[i]}`;
+    wrapperEl.appendChild(img);
+  }
 }
 function initGame(Game: game, canvas: HTMLCanvasElement) {
-  Game.grid = createGrid(10, 22);
+  Game.grid = createGrid(GRIDW, GRIDH);
   Game.gameBoard = canvas;
   Game.ctx = Game.gameBoard.getContext("2d");
   createGridBoard(Game.gameBoard, Game.grid);

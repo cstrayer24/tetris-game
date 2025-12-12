@@ -56,6 +56,7 @@ class TexturedBlock extends Block {
     color: string
   ) {
     super(x, y, ix, iy, width, height, color);
+    debugger;
     if (Object.hasOwn(colorTextureLUT, color)) {
       this.texturePath = colorTextureLUT[color];
     }
@@ -72,7 +73,7 @@ class TexturedBlock extends Block {
     ) as HTMLImageElement;
 
     if (imgel === null) {
-      const newImg = document.createElement("img");
+      const newImg = new Image();
       newImg.id = `texture_${color}`;
       newImg.src = this.texturePath;
       textureContainer.appendChild(newImg);

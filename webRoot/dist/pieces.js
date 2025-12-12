@@ -24,6 +24,7 @@ class TexturedBlock extends Block {
     // imgel: CanvasImageSource;
     constructor(x, y, ix, iy, width, height, color) {
         super(x, y, ix, iy, width, height, color);
+        debugger;
         if (Object.hasOwn(colorTextureLUT, color)) {
             this.texturePath = colorTextureLUT[color];
         }
@@ -36,7 +37,7 @@ class TexturedBlock extends Block {
         }
         const imgel = document.querySelector(`#texture_${color}`);
         if (imgel === null) {
-            const newImg = document.createElement("img");
+            const newImg = new Image();
             newImg.id = `texture_${color}`;
             newImg.src = this.texturePath;
             textureContainer.appendChild(newImg);
