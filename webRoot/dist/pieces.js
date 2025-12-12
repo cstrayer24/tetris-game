@@ -24,7 +24,6 @@ class TexturedBlock extends Block {
     // imgel: CanvasImageSource;
     constructor(x, y, ix, iy, width, height, color) {
         super(x, y, ix, iy, width, height, color);
-        debugger;
         if (Object.hasOwn(colorTextureLUT, color)) {
             this.texturePath = colorTextureLUT[color];
         }
