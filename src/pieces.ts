@@ -56,7 +56,6 @@ class TexturedBlock extends Block {
     color: string
   ) {
     super(x, y, ix, iy, width, height, color);
-    debugger;
     if (Object.hasOwn(colorTextureLUT, color)) {
       this.texturePath = colorTextureLUT[color];
     }
